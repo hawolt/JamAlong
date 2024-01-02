@@ -134,7 +134,11 @@ public class PlaybackHandler implements Runnable, InstructionListener {
     public void onInstruction(JSONObject object) {
         String instruction = object.getString("instruction");
         switch (instruction) {
+            case "list":
+                SocketServer.forward(object.toString());
+                break;
             case "close":
+                SocketServer.forward(object.toString());
                 SystemAudio.closeSourceDataLine();
                 break;
             case "seek":
@@ -148,6 +152,5 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                 source.preload(object.getString("url"));
                 break;
         }
-        SocketServer.forward(object.toString());
     }
 }

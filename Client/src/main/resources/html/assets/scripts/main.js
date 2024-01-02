@@ -121,7 +121,17 @@ function username(name, partyId) {
 }
 
 function join(partyId) {
-    call(origin + 'v1/api/join/' + partyId);
+    fetch(origin + 'v1/api/join/' + partyId)
+    .then((response) => response.json())
+    .then((data) => {
+        let args = data['result'].split(' ');
+        if(args[0] === partyId){
+            hideAllSAAS("page-attendee");
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 function load(link) {
@@ -135,7 +145,17 @@ function connect(host) {
     };
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
-        console.log(json);
+        switch(json['instruction']){
+            case 'list':
+                var users = json['users'];
+                var string = 'Host: '+users[0]+", Listeners: ";
+                for (let i = 1; i < users.length; i++) {
+                    if(i!=1)string+=", ";
+                    string += users[i];
+                }
+                document.getElementById('users').innerHTML=string;
+                break;
+        }
     };
     socket.onclose = function (msg) {
         console.log("disconnected from " + host);
