@@ -14,7 +14,6 @@ html, body {
     border: 1px solid #37323E;
     border-radius: 10px;
     font-size: 30px;
-    width: 100%;
     padding: 5px 10px 5px 10px;
 }
 
@@ -24,7 +23,9 @@ html, body {
 }
 
 #jamalong {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 #mainpage {
@@ -44,13 +45,31 @@ html, body {
     transition: transform .2s ease-in-out;
 }
 
-.settings:hover {
+.align-left {
+    margin: auto 0 auto 0;
+    text-align: left;
+}
+
+.back:hover {
     transform: scale(1.1);
+}
+
+.home:hover {
+    transform: scale(1.1);
+}
+
+.gear:hover {
+    transform: scale(1.1) rotate(90deg);
+}
+
+.settings:hover {
     cursor: pointer;
 }
 
 .saas {
+    height: 100%;
     padding: 10px;
+    display: flex;
 }
 
 .main {
@@ -58,8 +77,6 @@ html, body {
 }
 
 #page-landing {
-    margin: auto;
-    min-width: 200px;
     text-align: center;
 }
 
@@ -72,15 +89,56 @@ html, body {
     text-align: center;
 }
 
-.element-spacer {
+.expand {
+    width: 100%;
+}
+
+.gap {
     gap: 10px;
+}
+
+.center {
+    margin: auto;
+}
+
+.block {
+    display: block;
+}
+
+.flex {
     display: flex;
-    justify-content: space-between;
+}
+
+.add-margin {
+    margin-bottom: 10px;
+}
+
+.shrink {
+    height: 35px;
+}
+
+.fix {
+    font-size: 24px;
+    height: 32px;
+}
+
+.shrink-font {
+    font-size: 20px;
 }
 
 .hidden {
     display: none;
 }
+
+input[type=text], select {
+    width: 100%;
+    font-size: 13px;
+    padding: 12px 20px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
 
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */

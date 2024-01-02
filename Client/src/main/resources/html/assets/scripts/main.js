@@ -4,7 +4,7 @@ window.onload = function () {
     fetch(origin + 'v1/config/websocket')
         .then((response) => response.text())
         .then((data) => {
-            connect("ws://127.0.0.1:"+data);
+            connect("ws://127.0.0.1:" + data);
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -16,17 +16,17 @@ window.onload = function () {
         if (settings.classList.contains("fa-gear")) {
             settings.dataset.previous = getActiveSAAS();
             hideAllSAAS("page-settings");
-            settings.classList = "settings fa-solid fa-backward";
+            settings.classList = "settings fa-solid fa-backward back";
         } else {
             hideAllSAAS(settings.dataset.previous);
-            settings.classList = "settings fa-solid fa-gear";
+            settings.classList = "settings fa-solid fa-gear gear";
         }
     });
 
     const mainpage = document.getElementById("mainpage");
     mainpage.addEventListener("click", function () {
         settings.dataset.previous = "page-landing";
-        settings.classList = "settings fa-solid fa-gear";
+        settings.classList = "settings fa-solid fa-gear gear";
         hideAllSAAS("page-landing");
     });
 
@@ -56,6 +56,10 @@ window.onload = function () {
 
     document.getElementById("set-name").addEventListener("click", function () {
         username(document.getElementById("username").value, document.getElementById("partyid").value);
+    });
+
+    document.getElementById("copy").addEventListener("click", function () {
+        copyToClipboard(document.getElementById("party").innerHTML);
     });
 
     document.getElementById("select-host").addEventListener("click", function () {
@@ -124,16 +128,16 @@ function username(name, partyId) {
 
 function join(partyId) {
     fetch(origin + 'v1/api/join/' + partyId)
-    .then((response) => response.json())
-    .then((data) => {
-        let args = data['result'].split(' ');
-        if(args[0] === partyId){
-            hideAllSAAS("page-attendee");
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        .then((response) => response.json())
+        .then((data) => {
+            let args = data['result'].split(' ');
+            if (args[0] === partyId) {
+                hideAllSAAS("page-attendee");
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 }
 
 function load(link) {
@@ -147,15 +151,15 @@ function connect(host) {
     };
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
-        switch(json['instruction']){
+        switch (json['instruction']) {
             case 'list':
                 var users = json['users'];
-                var string = 'Host: '+users[0]+", Listeners: ";
+                var string = 'Host: ' + users[0] + ", Listeners: ";
                 for (let i = 1; i < users.length; i++) {
-                    if(i!=1)string+=", ";
+                    if (i != 1) string += ", ";
                     string += users[i];
                 }
-                document.getElementById('users').innerHTML=string;
+                document.getElementById('users').innerHTML = string;
                 break;
         }
     };

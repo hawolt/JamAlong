@@ -46,7 +46,7 @@ public class Jamalong {
             frame.dispose();
             container.removeAll();
             container.setBackground(new Color(224, 224, 224));
-            container.setPreferredSize(new Dimension(400, 150));
+            container.setPreferredSize(new Dimension(420, 180));
             container.add(chromium.getBrowserUI(), BorderLayout.CENTER);
             frame.pack();
             frame.setLocationRelativeTo(null);

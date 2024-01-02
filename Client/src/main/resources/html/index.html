@@ -13,35 +13,42 @@
 
     <div id="jamalong" class="centered">
         <div id="titlebar">
-            <i id="mainpage" class="fa-solid fa-house"></i>
+            <i id="mainpage" class="settings fa-solid fa-house home"></i>
             <span class="noselect">Jamalong</span>
-            <i id="settings" class="settings fa-solid fa-gear"></i>
+            <i id="settings" class="settings fa-solid fa-gear gear"></i>
         </div>
         
-        <div id="page-landing" class="saas element-spacer">
-            <div id="select-join" class="main-button select">Join</div>
-            <div id="select-host" class="main-button select">Host</div>
+        <div id="page-landing" class="saas gap">
+            <div id="select-join" class="center main-button expand select">Join</div>
+            <div id="select-host" class="center main-button expand select">Host</div>
         </div>
 
-        <div id="page-join" class="saas hidden">
-            <input type="text" id="partyid" placeholder="party id" size="32"/>
-            <button id="join">Join</button>
+        <div id="page-join" class="saas gap hidden">
+            <input class="center expand" type="text" id="partyid" placeholder="party id" size="32"/>
+            <div class="center main-button fix" id="join">Join</div>
         </div>
 
         <div id="page-attendee" class="saas hidden">
-            <span id="users" class="noselect"></span>
+            <span id="users" class="noselect center"></span>
         </div>
 
-        <div id="page-host" class="saas hidden">
-            <span id="party"></span>
-            <input type="text" id="sclink" placeholder="soundcloud link" size="16"/>
+        <div id="page-host" class="saas block hidden">
+            <div class="flex gap add-margin height-25">
+                <div id="party" class="expand align-left">1ff0dfc2-cb70-4ec1-8399-e7dccb8cd3c1</div>
+                <div class="main-button shrink-font" id="copy">copy</div>
+            </div>
+            <input class="shrink" type="text" id="sclink" placeholder="soundcloud link" size="16"/>
         </div>
 
-        <div id="page-settings" class="saas hidden">
-            <span>Gain-Control:</span>
-            <input type="range" min="-80" max="0" value="0" id="audio-gain">
-            <input type="text" id="username" placeholder="username" size="16"/>
-            <button id="set-name">set</button>
+        <div id="page-settings" class="saas block gap hidden">
+            <div class="flex gap add-margin shrink">
+                <div class="center">Volume</div>
+                <input type="range" min="-80" max="0" value="0" id="audio-gain" class="expand height40">
+            </div>
+            <div class="flex gap shrink">
+                <input type="text" id="username" placeholder="username" size="16"/>
+                <div class="main-button shrink-font" id="set-name">set</div>
+            </div>
         </div>
     </div>
 </div>

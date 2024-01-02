@@ -7,7 +7,11 @@ import org.cef.CefApp.CefAppState;
 import org.cef.CefClient;
 import org.cef.CefSettings;
 import org.cef.browser.CefBrowser;
+import org.cef.browser.CefFrame;
 import org.cef.browser.CefMessageRouter;
+import org.cef.callback.CefContextMenuParams;
+import org.cef.callback.CefMenuModel;
+import org.cef.handler.CefContextMenuHandler;
 import org.cef.handler.CefFocusHandlerAdapter;
 
 import java.awt.*;
@@ -48,6 +52,22 @@ public class Chromium {
         });
         cefApp_ = builder.build();
         client_ = cefApp_.createClient();
+        client_.addContextMenuHandler(new CefContextMenuHandler() {
+            @Override
+            public void onBeforeContextMenu(CefBrowser cefBrowser, CefFrame cefFrame, CefContextMenuParams cefContextMenuParams, CefMenuModel cefMenuModel) {
+                cefMenuModel.clear();
+            }
+
+            @Override
+            public boolean onContextMenuCommand(CefBrowser cefBrowser, CefFrame cefFrame, CefContextMenuParams cefContextMenuParams, int i, int i1) {
+                return false;
+            }
+
+            @Override
+            public void onContextMenuDismissed(CefBrowser cefBrowser, CefFrame cefFrame) {
+
+            }
+        });
         CefMessageRouter msgRouter = CefMessageRouter.create();
         client_.addMessageRouter(msgRouter);
         browser_ = client_.createBrowser(startURL, useOSR, isTransparent);
