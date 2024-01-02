@@ -65,8 +65,8 @@ window.onload = function () {
     input.addEventListener("keyup", function (event) {
         event.preventDefault();
         if (event.keyCode === 13) {
-            load(sclink.value);
-            sclink.value = "";
+            load(input.value);
+            input.value = "";
         }
     });
 }
@@ -117,15 +117,15 @@ function host() {
 }
 
 function username(name, partyId) {
-    call(host + 'v1/api/namechange/' + name + '/' + partyId);
+    call(origin + 'v1/api/namechange/' + name + '/' + partyId);
 }
 
 function join(partyId) {
-    call(host + 'v1/api/join/' + partyId);
+    call(origin + 'v1/api/join/' + partyId);
 }
 
 function load(link) {
-    call(host + 'v1/api/load?url=' + btoa(link));
+    call(origin + 'v1/api/load?url=' + btoa(link));
 }
 
 function connect(host) {
