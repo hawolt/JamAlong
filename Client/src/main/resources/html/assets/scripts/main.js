@@ -242,6 +242,7 @@ function build(owner, partyId, users) {
     const clipboardIconDiv = document.createElement('div');
     clipboardIconDiv.innerHTML = '<i class="selectable fa-solid fa-door-open"></i>';
     clipboardIconDiv.addEventListener("click", function () {
+        document.getElementById("partyid").value=partyId;
         join(partyId);
     });
 
