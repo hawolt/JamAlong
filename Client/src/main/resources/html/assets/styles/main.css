@@ -23,10 +23,7 @@ html, body {
 }
 
 #jamalong {
-    border: 1px solid #FCF7FF;
-    border-radius: 10px;
     display: block;
-    min-width: 600px;
 }
 
 #mainpage {
@@ -52,7 +49,6 @@ html, body {
 }
 
 .saas {
-    border-top: 1px solid #FCF7FF;
     padding: 10px;
 }
 
@@ -72,9 +68,7 @@ html, body {
 }
 
 .centered {
-    background: #322D39;
     text-align: center;
-    margin: auto;
 }
 
 .element-spacer {

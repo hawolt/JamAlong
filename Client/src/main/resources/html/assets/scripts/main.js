@@ -10,11 +10,6 @@ window.onload = function () {
             console.error('Error:', error);
         });
 
-    const mainpage = document.getElementById("mainpage");
-    mainpage.addEventListener("click", function () {
-        settings.dataset.previous = "page-landing";
-        hideAllSAAS("page-landing");
-    });
 
     const settings = document.getElementById("settings");
     settings.addEventListener("click", function () {
@@ -26,6 +21,13 @@ window.onload = function () {
             hideAllSAAS(settings.dataset.previous);
             settings.classList = "settings fa-solid fa-gear";
         }
+    });
+
+    const mainpage = document.getElementById("mainpage");
+    mainpage.addEventListener("click", function () {
+        settings.dataset.previous = "page-landing";
+        settings.classList = "settings fa-solid fa-gear";
+        hideAllSAAS("page-landing");
     });
 
 
