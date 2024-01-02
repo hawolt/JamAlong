@@ -59,7 +59,8 @@ public class LocalExecutor {
         RemoteClient remoteClient = pair.getK();
         PlaybackHandler playbackHandler = pair.getV();
         JSONObject object = remoteClient.executeBlocking("create");
-        LocalExecutor.PARTY_ID = object.getString("result");
+        System.out.println(object.toString());
+        LocalExecutor.PARTY_ID = object.getString("result").split(" ")[0];
         context.result(object.toString());
         playbackHandler.addStreamUpdateListener(new StreamUpdateListener() {
             @Override

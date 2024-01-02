@@ -115,6 +115,7 @@ function host() {
     fetch(origin + 'v1/api/host')
         .then((response) => response.json())
         .then((data) => {
+            document.getElementById("partyid").value = data.result;
             document.getElementById("party").innerHTML = data.result;
         })
         .catch((error) => {
