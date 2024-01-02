@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.hawolt</groupId>
-        <artifactId>Jamalong</artifactId>
+        <artifactId>JamAlong</artifactId>
         <version>1.0</version>
     </parent>
 
@@ -53,7 +53,7 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>Jamalong-${version}</finalName>
+                    <finalName>JamAlong-${version}</finalName>
                     <archive>
                         <manifest>
                             <mainClass>com.hawolt.Main</mainClass>

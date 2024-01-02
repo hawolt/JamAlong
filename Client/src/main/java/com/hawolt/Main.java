@@ -68,10 +68,10 @@ public class Main {
     public static void main(String[] args) {
         try {
             JsonSource source = JsonSource.of(Core.read(RunLevel.get("project.json")).toString());
-            Logger.info("Writing log for Jamalong-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
+            Logger.info("Writing log for JamAlong-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
         } catch (IOException e) {
             Logger.error(e);
-            System.err.println("Unable to launch Jamalong, exiting (1).");
+            System.err.println("Unable to launch JamAlong, exiting (1).");
             System.exit(1);
         }
         List<String> arguments = Arrays.asList(args);

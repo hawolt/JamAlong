@@ -122,6 +122,10 @@ public class PlaybackHandler implements Runnable, InstructionListener {
         }
     }
 
+    public void skip() {
+        SystemAudio.closeSourceDataLine();
+    }
+
     public AudioSource getAudioSource() {
         return source;
     }

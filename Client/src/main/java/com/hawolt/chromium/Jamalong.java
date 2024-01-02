@@ -20,9 +20,9 @@ public class Jamalong {
 
     public static void create(int port, boolean useOSR) throws IOException {
         JFrame frame = new JFrame();
-        String icon = "Jamalong.png";
+        String icon = "html/assets/Jamalong.png";
         frame.setIconImage(ImageIO.read(RunLevel.get(icon)));
-        frame.setTitle("Jamalong");
+        frame.setTitle("JamAlong");
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -46,7 +46,7 @@ public class Jamalong {
             frame.dispose();
             container.removeAll();
             container.setBackground(new Color(224, 224, 224));
-            container.setPreferredSize(new Dimension(420, 180));
+            container.setPreferredSize(new Dimension(550, 310));
             container.add(chromium.getBrowserUI(), BorderLayout.CENTER);
             frame.pack();
             frame.setLocationRelativeTo(null);

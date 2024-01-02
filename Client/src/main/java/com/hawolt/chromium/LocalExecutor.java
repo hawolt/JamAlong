@@ -32,11 +32,13 @@ public class LocalExecutor {
     public static void configure(int websocketPort, PlaybackHandler playbackHandler, AbstractAudioSource source, RemoteClient remoteClient) {
         path("/v1", () -> {
             path("/config", () -> {
+                get("/skip", context -> playbackHandler.skip());
                 get("/websocket", context -> context.result(String.valueOf(websocketPort)));
                 get("/gain/{value}", context -> SystemAudio.setGain(Float.parseFloat(context.pathParam("value"))));
             });
             path("/api", () -> {
                 get("/load", new ContextBiConsumer<>(source, LOAD));
+                get("/discover", new ContextBiConsumer<>(remoteClient, DISCOVER));
                 get("/host", new ContextBiConsumer<>(Pair.of(remoteClient, playbackHandler), HOST));
                 get("/namechange/{name}/{partyId}", new ContextBiConsumer<>(remoteClient, NAMECHANGE));
                 get("/join/{partyId}", new ContextBiConsumer<>(Pair.of(remoteClient, playbackHandler), JOIN));
@@ -59,7 +61,6 @@ public class LocalExecutor {
         RemoteClient remoteClient = pair.getK();
         PlaybackHandler playbackHandler = pair.getV();
         JSONObject object = remoteClient.executeBlocking("create");
-        System.out.println(object.toString());
         LocalExecutor.PARTY_ID = object.getString("result").split(" ")[0];
         context.result(object.toString());
         playbackHandler.addStreamUpdateListener(new StreamUpdateListener() {
@@ -106,6 +107,12 @@ public class LocalExecutor {
                 "name",
                 context.pathParam("partyId"),
                 context.pathParam("name")
+        );
+        context.result(object.toString());
+    };
+    private static BiConsumer<Context, RemoteClient> DISCOVER = (context, remoteClient) -> {
+        JSONObject object = remoteClient.executeBlocking(
+                "discover"
         );
         context.result(object.toString());
     };

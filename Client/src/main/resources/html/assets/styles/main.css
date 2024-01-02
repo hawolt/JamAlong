@@ -18,7 +18,7 @@ html, body {
 }
 
 .main-button:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
     cursor: pointer;
 }
 
@@ -66,10 +66,35 @@ html, body {
     cursor: pointer;
 }
 
-.saas {
-    height: 100%;
+#page-center {
     padding: 10px;
+    height: 100%;
+}
+
+.bar {
+    margin: 20px 5px 20px 5px;
+    height: auto;
+    justify-content: space-between;
+}
+
+.room {
+    background: #50514F;
+    border-radius: 10px;
+}
+
+.room-detail {
+    padding: 10px 5px 10px 5px;
+}
+
+#roomlist {
+    max-height: 100px;
+    overflow-y: scroll;
+    padding-right: 10px;
+}
+
+.saas {
     display: flex;
+    height: 100%;
 }
 
 .main {
@@ -109,6 +134,10 @@ html, body {
     display: flex;
 }
 
+.mini-margin {
+    margin: 3px;
+}
+
 .add-margin {
     margin-bottom: 10px;
 }
@@ -126,6 +155,14 @@ html, body {
     font-size: 20px;
 }
 
+.volume {
+    padding: 5px;
+}
+
+.selectable {
+    cursor: pointer;
+}
+
 .hidden {
     display: none;
 }
@@ -138,7 +175,7 @@ input[type=text], select {
     border: 1px solid #ccc;
     border-radius: 10px;
     box-sizing: border-box;
-  }
+}
 
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -149,3 +186,16 @@ input[type=text], select {
     user-select: none;
     /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #79B4A9;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #FCF7FF;
+}
+  

@@ -48,10 +48,15 @@ window.onload = function () {
 
 
     document.getElementById("select-join").addEventListener("click", function () {
+        discover();
         hideAllSAAS("page-join");
     });
     document.getElementById("join").addEventListener("click", function () {
         join(document.getElementById("partyid").value);
+    });
+
+    document.getElementById("skip").addEventListener("click", function () {
+        skip();
     });
 
     document.getElementById("set-name").addEventListener("click", function () {
@@ -111,6 +116,30 @@ function adjustAudioGain(value) {
     call(origin + 'v1/config/gain/' + value);
 }
 
+function skip() {
+    call(origin + 'v1/config/skip');
+}
+
+function discover() {
+    fetch(origin + 'v1/api/discover')
+        .then((response) => response.json())
+        .then((data) => {
+            const roomlist = document.getElementById("roomlist");
+            const rooms = data.result.split(',');
+            if (data.result.length == 0) return;
+            for (let i = 0; i < rooms.length; i++) {
+                var details = rooms[i].split(";");
+                var name = details[0];
+                var room = details[1];
+                var users = details[2];
+                roomlist.appendChild(build(name, room, users));
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
 function host() {
     fetch(origin + 'v1/api/host')
         .then((response) => response.json())
@@ -155,18 +184,73 @@ function connect(host) {
         switch (json['instruction']) {
             case 'list':
                 var users = json['users'];
-                var string = 'Host: ' + users[0] + ", Listeners: ";
+                var hosts = document.getElementsByClassName('host');
+                for (let i = 0; i < hosts.length; i++) {
+                    hosts[i].innerHTML = users[0];
+                }
+                var string = "";
                 for (let i = 1; i < users.length; i++) {
                     if (i != 1) string += ", ";
                     string += users[i];
                 }
-                document.getElementById('users').innerHTML = string;
+                var userlists = document.getElementsByClassName('userlist');
+                for (let i = 0; i < userlists.length; i++) {
+                    userlists[i].innerHTML = string;
+                }
+                var totals = document.getElementsByClassName('total');
+                for (let i = 0; i < totals.length; i++) {
+                    totals[i].innerHTML = users.length;
+                }
                 break;
         }
     };
     socket.onclose = function (msg) {
         console.log("disconnected from " + host);
     };
+}
+
+function build(owner, partyId, users) {
+    const roomDiv = document.createElement('div');
+    roomDiv.classList.add('room');
+
+    const roomDetailDiv = document.createElement('div');
+    roomDetailDiv.classList.add('room-detail', 'flex', 'bar', 'mini-margin');
+
+    const flexContainer1 = document.createElement('div');
+    flexContainer1.classList.add('flex', 'gap');
+
+    const userIconDiv = document.createElement('div');
+    userIconDiv.innerHTML = '<i class="fa-solid fa-user fa-xl"></i>';
+    flexContainer1.appendChild(userIconDiv);
+
+    const hostDiv = document.createElement('div');
+    hostDiv.classList.add('host');
+    hostDiv.textContent = users;
+    flexContainer1.appendChild(hostDiv);
+
+    roomDetailDiv.appendChild(flexContainer1);
+
+    const flexContainer2 = document.createElement('div');
+    flexContainer2.classList.add('flex', 'gap');
+
+    const roomIdDiv = document.createElement('div');
+    roomIdDiv.classList.add('room-id');
+    roomIdDiv.textContent = owner;
+    flexContainer2.appendChild(roomIdDiv);
+
+    const clipboardIconDiv = document.createElement('div');
+    clipboardIconDiv.innerHTML = '<i class="selectable fa-solid fa-door-open"></i>';
+    clipboardIconDiv.addEventListener("click", function () {
+        join(partyId);
+    });
+
+    flexContainer2.appendChild(clipboardIconDiv);
+
+    roomDetailDiv.appendChild(flexContainer2);
+
+    roomDiv.appendChild(roomDetailDiv);
+
+    return roomDiv;
 }
 
 function copyToClipboard(text) {
