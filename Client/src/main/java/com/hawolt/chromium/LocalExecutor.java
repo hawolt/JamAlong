@@ -27,9 +27,10 @@ public class LocalExecutor {
     public static HostType HOST_TYPE = HostType.UNKNOWN;
     public static String PARTY_ID;
 
-    public static void configure(PlaybackHandler playbackHandler, AbstractAudioSource source, RemoteClient remoteClient) {
+    public static void configure(int websocketPort, PlaybackHandler playbackHandler, AbstractAudioSource source, RemoteClient remoteClient) {
         path("/v1", () -> {
             path("/config", () -> {
+                get("/websocket", context -> context.result(String.valueOf(websocketPort)));
                 get("/gain/{value}", context -> SystemAudio.setGain(Float.parseFloat(context.pathParam("value"))));
             });
             path("/api", () -> {

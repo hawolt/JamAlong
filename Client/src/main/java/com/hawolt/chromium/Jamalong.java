@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 public class Jamalong {
     public static JFrame frame;
 
-    public static void create(boolean useOSR) throws IOException {
+    public static void create(int port, boolean useOSR) throws IOException {
         JFrame frame = new JFrame();
         String icon = "Jamalong.png";
         frame.setIconImage(ImageIO.read(RunLevel.get(icon)));
@@ -41,7 +41,8 @@ public class Jamalong {
         frame.setVisible(true);
         Path path = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jcef-bundle");
         try {
-            Chromium chromium = new Chromium("http://127.0.0.1:35199/home.html", path, useOSR, handler);
+            Logger.debug("{}", "http://127.0.0.1:" + port);
+            Chromium chromium = new Chromium("http://127.0.0.1:" + port, path, useOSR, handler);
             frame.dispose();
             container.removeAll();
             container.setBackground(new Color(224, 224, 224));

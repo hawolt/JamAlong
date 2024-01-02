@@ -56,7 +56,7 @@
                     <finalName>Jamalong-${version}</finalName>
                     <archive>
                         <manifest>
-                            <mainClass>com.hawolt.deprecated.Client</mainClass>
+                            <mainClass>com.hawolt.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

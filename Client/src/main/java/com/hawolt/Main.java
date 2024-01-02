@@ -21,6 +21,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class Main {
     private static final String[] REQUIRED_VM_OPTIONS = new String[]{
@@ -94,14 +95,17 @@ public class Main {
                 AbstractAudioSource source = new SoundcloudAudioSource();
                 RemoteClient remoteClient = RemoteClient.createAndConnectClientInstance(source);
                 PlaybackHandler playbackHandler = PlaybackHandler.start(remoteClient, source);
+                Random random = new Random();
+                int webserverPort = random.nextInt(30000) + 20000;
+                int websocketPort = random.nextInt(30000) + 20000;
                 Javalin.create(config -> config.addStaticFiles("/html", Location.CLASSPATH))
                         .before("/v1/*", context -> {
                             context.header("Access-Control-Allow-Origin", "*");
                         })
-                        .routes(() -> LocalExecutor.configure(playbackHandler, source, remoteClient))
-                        .start(35199);
-                SocketServer.launch();
-                Jamalong.create(useOSR);
+                        .routes(() -> LocalExecutor.configure(websocketPort, playbackHandler, source, remoteClient))
+                        .start(webserverPort);
+                SocketServer.launch(websocketPort);
+                Jamalong.create(webserverPort, useOSR);
             } catch (IOException e) {
                 Logger.error(e);
                 System.err.println("Unable to launch Jamalong, exiting (1).");

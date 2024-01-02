@@ -5,6 +5,7 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import java.awt.event.WindowEvent;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -20,8 +21,8 @@ public class SocketServer extends WebSocketServer {
         super(address);
     }
 
-    public static void launch() {
-        SocketServer.instance = new SocketServer(new InetSocketAddress(8887));
+    public static void launch(int websocketPort) {
+        SocketServer.instance = new SocketServer(new InetSocketAddress(websocketPort));
         SocketServer.instance.start();
     }
 
