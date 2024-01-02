@@ -125,6 +125,7 @@ function discover() {
         .then((response) => response.json())
         .then((data) => {
             const roomlist = document.getElementById("roomlist");
+            roomlist.innerHTML = "";
             const rooms = data.result.split(',');
             if (data.result.length == 0) return;
             for (let i = 0; i < rooms.length; i++) {
