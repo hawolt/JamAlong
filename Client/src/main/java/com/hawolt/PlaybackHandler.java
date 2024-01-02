@@ -42,6 +42,14 @@ public class PlaybackHandler implements Runnable, InstructionListener {
         return playbackHandler;
     }
 
+    public void addStreamUpdateListener(StreamUpdateListener listener) {
+        this.list.add(listener);
+    }
+
+    public void clearStreamUpdateListeners() {
+        this.list.clear();
+    }
+
     public void stop() {
         Thread.currentThread().interrupt();
         service.shutdown();

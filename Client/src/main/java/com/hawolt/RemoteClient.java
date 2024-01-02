@@ -90,32 +90,6 @@ public class RemoteClient extends WebSocketClient {
                 for (InstructionListener listener : list) {
                     listener.onInstruction(object);
                 }
-                /*
-
-                String instruction = object.getString("instruction");
-                switch (instruction) {
-                    case "list":
-                        JSONArray users = object.getJSONArray("users");
-                        GraphicalUserInterface.getModel().clear();
-                        for (int i = 0; i < users.length(); i++) {
-                            GraphicalUserInterface.getModel().addElement(users.getString(i));
-                        }
-                        break;
-                    case "close":
-                        SystemAudio.closeSourceDataLine();
-                        break;
-                    case "seek":
-                        this.timestamp = object.getLong("timestamp");
-                        break;
-                    case "revalidate":
-                        SystemAudio.closeSourceDataLine();
-                        source.load(object.getString("url"));
-                        break;
-                    case "preload":
-                        source.preload(object.getString("url"));
-                        break;
-                }
-                 */
             } else if (object.has("uuid")) {
                 String uuid = object.getString("uuid");
                 if (!pending.containsKey(uuid)) {

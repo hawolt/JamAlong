@@ -5,7 +5,10 @@ import com.hawolt.PlaybackHandler;
 import com.hawolt.RemoteClient;
 import com.hawolt.audio.SystemAudio;
 import com.hawolt.common.Pair;
+import com.hawolt.logger.Logger;
+import com.hawolt.source.Audio;
 import com.hawolt.source.AudioSource;
+import com.hawolt.source.StreamUpdateListener;
 import com.hawolt.source.impl.AbstractAudioSource;
 import io.javalin.http.Context;
 import org.json.JSONObject;
@@ -23,7 +26,6 @@ import static io.javalin.apibuilder.ApiBuilder.path;
  **/
 
 public class LocalExecutor {
-
     public static HostType HOST_TYPE = HostType.UNKNOWN;
     public static String PARTY_ID;
 
@@ -35,7 +37,7 @@ public class LocalExecutor {
             });
             path("/api", () -> {
                 get("/load", new ContextBiConsumer<>(source, LOAD));
-                get("/host", new ContextBiConsumer<>(remoteClient, HOST));
+                get("/host", new ContextBiConsumer<>(Pair.of(remoteClient, playbackHandler), HOST));
                 get("/namechange/{name}/{partyId}", new ContextBiConsumer<>(remoteClient, NAMECHANGE));
                 get("/join/{partyId}", new ContextBiConsumer<>(Pair.of(remoteClient, playbackHandler), JOIN));
             });
@@ -52,39 +54,30 @@ public class LocalExecutor {
         }
     };
 
-    private static BiConsumer<Context, RemoteClient> HOST = (context, remoteClient) -> {
+    private static BiConsumer<Context, Pair<RemoteClient, PlaybackHandler>> HOST = (context, pair) -> {
         LocalExecutor.HOST_TYPE = HostType.HOST;
+        RemoteClient remoteClient = pair.getK();
+        PlaybackHandler playbackHandler = pair.getV();
         JSONObject object = remoteClient.executeBlocking("create");
         LocalExecutor.PARTY_ID = object.getString("result");
         context.result(object.toString());
-        /*
-        object -> {
-            String roomId = object.getString("result");
-            Logger.debug("Created room:{}", roomId);
-            soundcloudInterface.getInput().setEnabled(true);
-            soundcloudInterface.getInput().setText("");
-            client.setRoomId(roomId);
-            input.setText(roomId);
-            start.setEnabled(false);
-            client.addStreamUpdateListener(new StreamUpdateListener() {
-                @Override
-                public void onAudioUpdate(Audio audio, long timestamp) {
-                    client.execute("revalidate", object -> {
-                        boolean success = object.getString("result").equals(client.getRoomId());
-                        Logger.debug("revalidated:{}", success);
-                    }, client.getRoomId(), String.valueOf(timestamp), audio.source());
-                }
+        playbackHandler.addStreamUpdateListener(new StreamUpdateListener() {
+            @Override
+            public void onAudioUpdate(Audio audio, long timestamp) {
+                remoteClient.executeAsynchronous("revalidate", object -> {
+                    boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
+                    Logger.debug("revalidated:{}", success);
+                }, LocalExecutor.PARTY_ID, String.valueOf(timestamp), audio.source());
+            }
 
-                @Override
-                public void onAudioPeekUpdate(Audio audio) {
-                    client.execute("preload", object -> {
-                        boolean success = object.getString("result").equals(client.getRoomId());
-                        Logger.debug("preload:{}", success);
-                    }, client.getRoomId(), audio.source());
-                }
-            });
-        }
-         */
+            @Override
+            public void onAudioPeekUpdate(Audio audio) {
+                remoteClient.executeAsynchronous("preload", object -> {
+                    boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
+                    Logger.debug("preload:{}", success);
+                }, LocalExecutor.PARTY_ID, audio.source());
+            }
+        });
     };
     private static BiConsumer<Context, Pair<RemoteClient, PlaybackHandler>> JOIN = (context, pair) -> {
         LocalExecutor.HOST_TYPE = HostType.ATTENDEE;
@@ -98,6 +91,7 @@ public class LocalExecutor {
         String[] arguments = object.getString("result").split(" ");
         if (arguments.length == 0) return;
         LocalExecutor.PARTY_ID = arguments[0];
+        playbackHandler.clearStreamUpdateListeners();
         if (arguments.length == 1) return;
         playbackHandler.setTimestamp(Long.parseLong(arguments[1]));
         AudioSource source = playbackHandler.getAudioSource();
