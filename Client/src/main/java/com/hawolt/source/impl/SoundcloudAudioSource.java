@@ -19,7 +19,6 @@ import java.util.*;
 public class SoundcloudAudioSource extends AbstractAudioSource implements DownloadCallback {
     private final Map<String, byte[]> cache = new HashMap<>();
     private final List<String> preload = new ArrayList<>();
-    private final Set<Long> set = new HashSet<>();
 
     public SoundcloudAudioSource() {
         Soundcloud.register(Track.class, new TrackManager(this::onTrackData));
@@ -38,7 +37,9 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
     }
 
     public void onPlaylistData(String link, Playlist playlist) {
-        for (long id : playlist) {
+        List<Long> list = playlist.getList();
+        Collections.shuffle(list);
+        for (long id : list) {
             try {
                 TrackQuery query = new TrackQuery(id, playlist.getId(), playlist.getSecret());
                 ObjectCollection<Track> collection = Explorer.browse(query);
@@ -56,11 +57,7 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
             onTrack(track, cache.get(link));
             cache.remove(link);
             return;
-        } else if (set.contains(track.getId())) {
-            Logger.debug("track {} skipped as duplicate entry", track.getId());
-            return;
         }
-        set.add(track.getId());
         track.retrieveMP3().whenComplete((mp3, throwable) -> {
             if (throwable != null) Logger.error(throwable);
             if (mp3 == null) return;

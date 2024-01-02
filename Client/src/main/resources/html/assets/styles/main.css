@@ -1,5 +1,91 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
+html, body {
+    font-family: 'Roboto', sans-serif;
+    background: #37323E;
+    color: #FCF7FF;
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+
+.main-button {
+    background: #79B4A9;
+    border: 1px solid #37323E;
+    border-radius: 10px;
+    font-size: 30px;
+    padding: 5px 10px 5px 10px;
+}
+
+.main-button:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+#jamalong {
+    border: 1px solid #FCF7FF;
+    border-radius: 10px;
+    display: block;
+    min-width: 600px;
+}
+
+#mainpage {
+    cursor: pointer;
+}
+
+#titlebar {
+    font-size: 40px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    justify-content: space-between;
+}
+
+.settings {
+    transition: transform .2s ease-in-out;
+}
+
+.settings:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.saas {
+    border-top: 1px solid #FCF7FF;
+    padding: 10px;
+}
+
+.main {
+    flex-direction: column;
+}
+
+#page-landing {
+    margin: auto;
+    min-width: 200px;
+    text-align: center;
+}
+
+.wrapper {
+    height: 100%;
+    display: flex;
+}
+
+.centered {
+    background: #322D39;
+    text-align: center;
+    margin: auto;
+}
+
+.element-spacer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.hidden {
+    display: none;
+}
+
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

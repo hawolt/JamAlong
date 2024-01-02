@@ -7,6 +7,8 @@ import com.hawolt.io.Core;
 import com.hawolt.io.JsonSource;
 import com.hawolt.io.RunLevel;
 import com.hawolt.logger.Logger;
+import com.hawolt.source.impl.AbstractAudioSource;
+import com.hawolt.source.impl.SoundcloudAudioSource;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
@@ -89,11 +91,14 @@ public class Main {
             }
         } else {
             try {
+                AbstractAudioSource source = new SoundcloudAudioSource();
+                RemoteClient remoteClient = RemoteClient.createAndConnectClientInstance(source);
+                PlaybackHandler playbackHandler = PlaybackHandler.start(remoteClient, source);
                 Javalin.create(config -> config.addStaticFiles("/html", Location.CLASSPATH))
                         .before("/v1/*", context -> {
                             context.header("Access-Control-Allow-Origin", "*");
                         })
-                        .routes(LocalExecutor::configure)
+                        .routes(() -> LocalExecutor.configure(playbackHandler, source, remoteClient))
                         .start(35199);
                 SocketServer.launch();
                 Jamalong.create(useOSR);
