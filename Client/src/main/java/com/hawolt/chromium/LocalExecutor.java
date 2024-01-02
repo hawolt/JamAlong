@@ -104,8 +104,8 @@ public class LocalExecutor {
     private static BiConsumer<Context, RemoteClient> NAMECHANGE = (context, remoteClient) -> {
         JSONObject object = remoteClient.executeBlocking(
                 "name",
-                context.pathParam("name"),
-                context.pathParam("partyId")
+                context.pathParam("partyId"),
+                context.pathParam("name")
         );
         context.result(object.toString());
     };
