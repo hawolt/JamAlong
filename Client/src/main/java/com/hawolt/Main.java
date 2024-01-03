@@ -3,25 +3,30 @@ package com.hawolt;
 import com.hawolt.chromium.Jamalong;
 import com.hawolt.chromium.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
+import com.hawolt.discord.RichPresence;
 import com.hawolt.io.Core;
 import com.hawolt.io.JsonSource;
 import com.hawolt.io.RunLevel;
 import com.hawolt.logger.Logger;
+import com.hawolt.os.OperatingSystem;
+import com.hawolt.registry.Elevator;
+import com.hawolt.registry.ProcessExecutor;
+import com.hawolt.registry.RegisterCustomProtocol;
+import com.hawolt.registry.RegistryPermissionException;
 import com.hawolt.source.impl.AbstractAudioSource;
 import com.hawolt.source.impl.SoundcloudAudioSource;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.net.URISyntaxException;
+import java.util.*;
 
 public class Main {
     private static final String[] REQUIRED_VM_OPTIONS = new String[]{
@@ -66,6 +71,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        boolean elevated = args.length > 0 && args[0].equals("elevate");
         try {
             JsonSource source = JsonSource.of(Core.read(RunLevel.get("project.json")).toString());
             Logger.info("Writing log for JamAlong-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
@@ -104,6 +110,19 @@ public class Main {
                         })
                         .routes(() -> LocalExecutor.configure(websocketPort, playbackHandler, source, remoteClient))
                         .start(webserverPort);
+
+                try {
+                    switch (OperatingSystem.getOperatingSystemType()) {
+                        case WINDOWS -> Elevator.addRegistryKeyOrElevate("jamalong", elevated);
+                    }
+                } catch (Exception e) {
+                    Logger.error(e);
+                    if (RunLevel.getLevel(Main.class) != RunLevel.FILE) {
+                        System.exit(2);
+                    }
+                }
+
+                Optional<RichPresence> presence = RichPresence.create();
                 SocketServer.launch(websocketPort);
                 Jamalong.create(webserverPort, useOSR);
             } catch (IOException e) {
