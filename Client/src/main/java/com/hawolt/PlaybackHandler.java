@@ -16,6 +16,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import java.util.concurrent.Executors;
 public class PlaybackHandler implements Runnable, InstructionListener {
     private final ExecutorService service = Executors.newSingleThreadExecutor();
     private final List<StreamUpdateListener> list = new LinkedList<>();
+    private final List<String> skip = new ArrayList<>();
     private final AbstractAudioSource source;
     private final RemoteClient remoteClient;
     private long timestamp;
@@ -56,8 +58,8 @@ public class PlaybackHandler implements Runnable, InstructionListener {
     }
 
     public void reset() {
-        SystemAudio.closeSourceDataLine();
         this.source.clear();
+        SystemAudio.closeSourceDataLine();
     }
 
     @Override
@@ -89,7 +91,9 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                     }, LocalExecutor.PARTY_ID, String.valueOf(System.currentTimeMillis()));
                 }
 
+                checkSkipList();
                 while (SystemAudio.sourceDataLine.isOpen() && (read = audioInputStream.read(buffer, 0, buffer.length)) != -1) {
+                    checkSkipList();
                     int offset = getAudioPointerOffset(current.data());
                     if (offset != 0) {
                         Logger.debug("[player] seek to {}", offset);
@@ -111,6 +115,13 @@ public class PlaybackHandler implements Runnable, InstructionListener {
         } while (true);
     }
 
+    private void checkSkipList() {
+        if (!skip.contains(current.source())) return;
+        Logger.debug("[player] skip {}", current.source());
+        skip.remove(current.source());
+        SystemAudio.closeSourceDataLine();
+    }
+
     public int getAudioPointerOffset(byte[] b) {
         if (timestamp == 0) return 0;
         try {
@@ -128,6 +139,10 @@ public class PlaybackHandler implements Runnable, InstructionListener {
     }
 
     public void skip() {
+        remoteClient.executeAsynchronous("skip", object -> {
+            boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
+            Logger.debug("skip:{}", success);
+        }, LocalExecutor.PARTY_ID, current.source());
         SystemAudio.closeSourceDataLine();
     }
 
@@ -143,6 +158,10 @@ public class PlaybackHandler implements Runnable, InstructionListener {
     public void onInstruction(JSONObject object) {
         String instruction = object.getString("instruction");
         switch (instruction) {
+            case "skip":
+                String toSkip = object.getString("track");
+                this.skip.add(toSkip);
+                break;
             case "list":
                 SocketServer.forward(object.toString());
                 break;

@@ -29,6 +29,8 @@ public class LocalExecutor {
     public static HostType HOST_TYPE = HostType.UNKNOWN;
     public static String PARTY_ID;
 
+    public static long RESET_TIMESTAMP;
+
     public static void configure(int websocketPort, PlaybackHandler playbackHandler, AbstractAudioSource source, RemoteClient remoteClient) {
         path("/v1", () -> {
             path("/config", () -> {
@@ -119,6 +121,7 @@ public class LocalExecutor {
         context.result(object.toString());
     };
     private static BiConsumer<Context, Pair<RemoteClient, PlaybackHandler>> RESET = (context, pair) -> {
+        LocalExecutor.RESET_TIMESTAMP = System.currentTimeMillis();
         RemoteClient remoteClient = pair.getK();
         JSONObject object = remoteClient.executeBlocking(
                 "leave",

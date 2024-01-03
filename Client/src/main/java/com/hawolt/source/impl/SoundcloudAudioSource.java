@@ -2,6 +2,7 @@ package com.hawolt.source.impl;
 
 import com.hawolt.Soundcloud;
 import com.hawolt.audio.AudioFormatConverter;
+import com.hawolt.chromium.LocalExecutor;
 import com.hawolt.data.media.download.DownloadCallback;
 import com.hawolt.data.media.hydratable.impl.playlist.Playlist;
 import com.hawolt.data.media.hydratable.impl.playlist.PlaylistManager;
@@ -37,6 +38,7 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
     }
 
     public void onPlaylistData(String link, Playlist playlist) {
+        if (playlist.getObjectTimestamp() <= LocalExecutor.RESET_TIMESTAMP) return;
         List<Long> list = playlist.getList();
         Collections.shuffle(list);
         for (long id : list) {
@@ -87,6 +89,7 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
 
     @Override
     public void onTrack(Track track, byte[] bytes) {
+        if (track.getObjectTimestamp() <= LocalExecutor.RESET_TIMESTAMP) return;
         try {
             push(
                     new SimpleAudio(
