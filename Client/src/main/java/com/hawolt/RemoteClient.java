@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class RemoteClient extends WebSocketClient {
-    private static String host = "ws://127.0.0.1:48157/?sudo=false&name=anon";
+    private static String host = "ws://hawolt.com:48157/?sudo=false&name=anon";
 
     public static RemoteClient createAndConnectClientInstance() {
         try {
