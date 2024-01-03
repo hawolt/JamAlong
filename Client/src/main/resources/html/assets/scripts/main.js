@@ -1,6 +1,7 @@
 const origin = window.location;
 
 window.onload = function () {
+    configure("idle");
     fetch(origin + 'v1/config/websocket')
         .then((response) => response.text())
         .then((data) => {
@@ -11,11 +12,26 @@ window.onload = function () {
         });
 
 
+    const visibility = document.getElementById('visibility');
+    visibility.addEventListener('change', e => {
+        if (e.target.checked === true) {
+            togglePartyVisibility(document.getElementById("partyid").value, true);
+        }
+        if (e.target.checked === false) {
+            togglePartyVisibility(document.getElementById("partyid").value, false);
+        }
+    });
+
     const settings = document.getElementById("settings");
     settings.addEventListener("click", function () {
         if (settings.classList.contains("fa-gear")) {
             settings.dataset.previous = getActiveSAAS();
             hideAllSAAS("page-settings");
+            if (document.getElementById('jamalong').dataset.status === "host") {
+                if (visibility.classList.contains("hidden")) visibility.classList.remove("hidden");
+            } else {
+                if (!visibility.classList.contains("hidden")) visibility.classList.add("hidden");
+            }
             settings.classList = "settings fa-solid fa-backward back";
         } else {
             hideAllSAAS(settings.dataset.previous);
@@ -25,6 +41,8 @@ window.onload = function () {
 
     const mainpage = document.getElementById("mainpage");
     mainpage.addEventListener("click", function () {
+        reset();
+        configure("idle");
         settings.dataset.previous = "page-landing";
         settings.classList = "settings fa-solid fa-gear gear";
         hideAllSAAS("page-landing");
@@ -48,6 +66,7 @@ window.onload = function () {
 
 
     document.getElementById("select-join").addEventListener("click", function () {
+        configure("attendee");
         discover();
         hideAllSAAS("page-join");
     });
@@ -68,6 +87,7 @@ window.onload = function () {
     });
 
     document.getElementById("select-host").addEventListener("click", function () {
+        configure("host");
         host();
         hideAllSAAS("page-host");
     });
@@ -80,6 +100,10 @@ window.onload = function () {
             input.value = "";
         }
     });
+}
+
+function configure(current) {
+    document.getElementById('jamalong').dataset.status = current;
 }
 
 function getActiveSAAS() {
@@ -118,6 +142,10 @@ function adjustAudioGain(value) {
 
 function skip() {
     call(origin + 'v1/config/skip');
+}
+
+function reset() {
+    call(origin + 'v1/config/reset');
 }
 
 function discover() {
@@ -174,6 +202,11 @@ function join(partyId) {
 function load(link) {
     call(origin + 'v1/api/load?url=' + btoa(link));
 }
+
+function togglePartyVisibility(partyId, status) {
+    call(origin + 'v1/api/visibility/' + partyId + '/' + status);
+}
+
 
 function connect(host) {
     let socket = new WebSocket(host);
@@ -242,7 +275,7 @@ function build(owner, partyId, users) {
     const clipboardIconDiv = document.createElement('div');
     clipboardIconDiv.innerHTML = '<i class="selectable fa-solid fa-door-open"></i>';
     clipboardIconDiv.addEventListener("click", function () {
-        document.getElementById("partyid").value=partyId;
+        document.getElementById("partyid").value = partyId;
         join(partyId);
     });
 

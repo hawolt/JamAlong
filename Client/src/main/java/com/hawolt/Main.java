@@ -93,7 +93,7 @@ public class Main {
         } else {
             try {
                 AbstractAudioSource source = new SoundcloudAudioSource();
-                RemoteClient remoteClient = RemoteClient.createAndConnectClientInstance(source);
+                RemoteClient remoteClient = RemoteClient.createAndConnectClientInstance();
                 PlaybackHandler playbackHandler = PlaybackHandler.start(remoteClient, source);
                 Random random = new Random();
                 int webserverPort = random.nextInt(30000) + 20000;

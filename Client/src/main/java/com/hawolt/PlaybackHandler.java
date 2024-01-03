@@ -55,6 +55,11 @@ public class PlaybackHandler implements Runnable, InstructionListener {
         service.shutdown();
     }
 
+    public void reset() {
+        SystemAudio.closeSourceDataLine();
+        this.source.clear();
+    }
+
     @Override
     public void run() {
         do {

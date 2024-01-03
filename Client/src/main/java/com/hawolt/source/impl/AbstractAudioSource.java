@@ -46,4 +46,9 @@ public abstract class AbstractAudioSource implements AudioSource {
         }
         return audio.get();
     }
+
+    @Override
+    public void clear() {
+        this.list.clear();
+    }
 }

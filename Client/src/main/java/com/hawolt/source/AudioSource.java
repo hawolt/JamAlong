@@ -15,5 +15,7 @@ public interface AudioSource {
 
     Optional<Audio> peek();
 
+    void clear();
+
     Audio pop();
 }

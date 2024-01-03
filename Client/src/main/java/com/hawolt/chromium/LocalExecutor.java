@@ -34,6 +34,7 @@ public class LocalExecutor {
             path("/config", () -> {
                 get("/skip", context -> playbackHandler.skip());
                 get("/websocket", context -> context.result(String.valueOf(websocketPort)));
+                get("/reset", new ContextBiConsumer<>(Pair.of(remoteClient, playbackHandler), RESET));
                 get("/gain/{value}", context -> SystemAudio.setGain(Float.parseFloat(context.pathParam("value"))));
             });
             path("/api", () -> {
@@ -41,6 +42,7 @@ public class LocalExecutor {
                 get("/discover", new ContextBiConsumer<>(remoteClient, DISCOVER));
                 get("/host", new ContextBiConsumer<>(Pair.of(remoteClient, playbackHandler), HOST));
                 get("/namechange/{name}/{partyId}", new ContextBiConsumer<>(remoteClient, NAMECHANGE));
+                get("/visibility/{partyId}/{status}", new ContextBiConsumer<>(remoteClient, VISIBILITY));
                 get("/join/{partyId}", new ContextBiConsumer<>(Pair.of(remoteClient, playbackHandler), JOIN));
             });
         });
@@ -113,6 +115,24 @@ public class LocalExecutor {
     private static BiConsumer<Context, RemoteClient> DISCOVER = (context, remoteClient) -> {
         JSONObject object = remoteClient.executeBlocking(
                 "discover"
+        );
+        context.result(object.toString());
+    };
+    private static BiConsumer<Context, Pair<RemoteClient, PlaybackHandler>> RESET = (context, pair) -> {
+        RemoteClient remoteClient = pair.getK();
+        JSONObject object = remoteClient.executeBlocking(
+                "leave",
+                LocalExecutor.PARTY_ID == null ? "nil" : LocalExecutor.PARTY_ID
+        );
+        PlaybackHandler playbackHandler = pair.getV();
+        playbackHandler.reset();
+        context.result(object.toString());
+    };
+    private static BiConsumer<Context, RemoteClient> VISIBILITY = (context, remoteClient) -> {
+        JSONObject object = remoteClient.executeBlocking(
+                "visibility",
+                context.pathParam("partyId"),
+                context.pathParam("status")
         );
         context.result(object.toString());
     };

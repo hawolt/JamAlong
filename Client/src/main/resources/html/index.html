@@ -17,13 +17,13 @@
             <span class="noselect">JamAlong</span>
             <i id="settings" class="settings fa-solid fa-gear gear"></i>
         </div>
-        
+
         <div id="page-center">
             <div id="page-landing" class="saas gap">
                 <div id="select-join" class="center main-button expand select">Join</div>
                 <div id="select-host" class="center main-button expand select">Host</div>
             </div>
-    
+
             <div id="page-join" class="saas block hidden">
                 <div class="flex gap add-margin">
                     <input class="center expand" type="text" id="partyid" placeholder="party id" size="32"/>
@@ -32,13 +32,13 @@
                 <div class="block" id="roomlist">
                 </div>
             </div>
-    
+
             <div id="page-attendee" class="saas block hidden">
                 <div class="flex bar">
                     <div class="flex gap">
                         <div><i class="fa-solid fa-user fa-2xl"></i></div>
                         <div class="host"></div>
-                    </div> 
+                    </div>
                     <div class="flex gap">
                         <div class="total"></div>
                         <div><i class="fa-solid fa-ghost fa-2xl"></i></div>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="userlist noselect center"></div>
             </div>
-    
+
             <div id="page-host" class="saas block hidden">
                 <div class="flex gap add-margin height-25">
                     <div id="party" class="expand align-left"></div>
@@ -60,7 +60,7 @@
                     <div class="flex gap">
                         <div><i class="fa-solid fa-user fa-2xl"></i></div>
                         <div class="host"></div>
-                    </div> 
+                    </div>
                     <div class="flex gap">
                         <div class="total"></div>
                         <div><i class="fa-solid fa-ghost fa-2xl"></i></div>
@@ -68,15 +68,19 @@
                 </div>
                 <div class="userlist noselect center"></div>
             </div>
-    
+
             <div id="page-settings" class="saas block gap hidden">
                 <div class="flex gap shrink">
                     <input type="text" id="username" placeholder="username" size="16"/>
                     <div class="main-button shrink-font" id="set-name">set</div>
                 </div>
+                <div id="visibility" class="flex bar hidden">
+                    <div>Private Party</div>
+                    <input type="checkbox" id="private" checked="true">
+                </div>
             </div>
         </div>
-        
+
         <div class="volume flex gap add-margin">
             <div class="center">Volume</div>
             <input type="range" min="-80" max="0" value="0" id="audio-gain" class="expand height40">
