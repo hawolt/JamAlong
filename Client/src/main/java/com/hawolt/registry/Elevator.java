@@ -14,7 +14,6 @@ public class Elevator {
 
     public static void addRegistryKeyOrElevate(String protocol, boolean elevated) throws Exception {
         File self = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        RegisterCustomProtocol.checkup("C:\\Users\\Niklas\\Nextcloud\\IntelliJ IDEA\\Github\\soundcloud-together\\Client\\target\\JamAlong-1.11.jar", protocol);
         if (!self.getName().endsWith(".jar")) {
             throw new Exception("Unable to restart automatically missing Administrator privileges");
         }
