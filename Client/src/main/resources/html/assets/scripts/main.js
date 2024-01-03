@@ -41,11 +41,7 @@ window.onload = function () {
 
     const mainpage = document.getElementById("mainpage");
     mainpage.addEventListener("click", function () {
-        reset();
-        configure("idle");
-        settings.dataset.previous = "page-landing";
-        settings.classList = "settings fa-solid fa-gear gear";
-        hideAllSAAS("page-landing");
+        openLandingPage();
     });
 
 
@@ -100,6 +96,15 @@ window.onload = function () {
             input.value = "";
         }
     });
+}
+
+function openLandingPage(){
+    reset();
+    configure("idle");
+    const settings = document.getElementById("settings");
+    settings.dataset.previous = "page-landing";
+    settings.classList = "settings fa-solid fa-gear gear";
+    hideAllSAAS("page-landing");
 }
 
 function configure(current) {
@@ -216,6 +221,9 @@ function connect(host) {
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
         switch (json['instruction']) {
+            case 'kill':
+                openLandingPage();
+                break;
             case 'list':
                 var users = json['users'];
                 var hosts = document.getElementsByClassName('host');

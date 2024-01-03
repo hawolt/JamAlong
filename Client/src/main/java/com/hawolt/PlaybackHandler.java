@@ -86,6 +86,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
 
                 if (LocalExecutor.HOST_TYPE == HostType.HOST) {
                     remoteClient.executeAsynchronous("seek", object -> {
+                        //UNKNOWN_ROOM
                         boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
                         Logger.debug("seek:{}", success);
                     }, LocalExecutor.PARTY_ID, String.valueOf(System.currentTimeMillis()));

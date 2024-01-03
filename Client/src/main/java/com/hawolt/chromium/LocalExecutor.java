@@ -71,8 +71,14 @@ public class LocalExecutor {
             @Override
             public void onAudioUpdate(Audio audio, long timestamp) {
                 remoteClient.executeAsynchronous("revalidate", object -> {
-                    boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
-                    Logger.debug("revalidated:{}", success);
+                    String result = object.getString("result");
+                    if ("UNKNOWN_ROOM".equals(result)) {
+                        JSONObject instruction = new JSONObject();
+                        instruction.put("instruction", "kill");
+                        SocketServer.forward(instruction.toString());
+                        playbackHandler.reset();
+                    }
+                    Logger.debug("revalidated:{}", result.equals(LocalExecutor.PARTY_ID));
                 }, LocalExecutor.PARTY_ID, String.valueOf(timestamp), audio.source());
             }
 
