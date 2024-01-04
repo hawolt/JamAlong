@@ -44,6 +44,11 @@
             <artifactId>soundcloud-downloader</artifactId>
             <version>6270bfb626</version>
         </dependency>
+	<dependency>
+	    <groupId>com.github.orphan-oss</groupId>
+	    <artifactId>launch4j-maven-plugin</artifactId>
+	    <version>launch4j-maven-plugin-2.4.1</version>
+	</dependency>
     </dependencies>
 
     <build>
@@ -55,6 +60,54 @@
                     <source>17</source>
                     <target>17</target>
                 </configuration>
+            </plugin>
+		<plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>console</headerType>
+                            <outfile>target/JamAlong.exe</outfile>
+                            <jar>target/JamAlong-1.14.jar</jar>
+                            <classPath>
+                                <mainClass>Client.src.main.java.com.hawolt.Main</mainClass>
+                                <preCp>anything</preCp>
+                            </classPath>
+                            <singleInstance>
+                                <mutexName>JamAlong</mutexName>
+                                <windowTitle>JamAlong</windowTitle>
+                            </singleInstance>
+                            <jre>
+                                <requiresJdk>false</requiresJdk>
+                                <requires64Bit>false</requires64Bit>
+                                <path>%JAVA_HOME%;%PATH%</path>
+                                <minVersion>1.8</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>
+                                    1.0.0.0
+                                </fileVersion>
+                                <fileDescription>JamAlong</fileDescription>
+                                <productVersion>
+                                    1.0.0.0
+                                </productVersion>
+                                <txtProductVersion>
+                                    1.0.0.0
+                                </txtProductVersion>
+                                <copyright>Hawolt ™</copyright>
+                                <productName>JamAlong</productName>
+                                <internalName>JamAlong</internalName>
+                                <originalFilename>JamAlong.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
