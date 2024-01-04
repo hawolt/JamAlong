@@ -220,30 +220,35 @@ function connect(host) {
     };
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
-        switch (json['instruction']) {
-            case 'kill':
-                openLandingPage();
-                break;
-            case 'list':
-                var users = json['users'];
-                var hosts = document.getElementsByClassName('host');
-                for (let i = 0; i < hosts.length; i++) {
-                    hosts[i].innerHTML = users[0];
-                }
-                var string = "";
-                for (let i = 1; i < users.length; i++) {
-                    if (i != 1) string += ", ";
-                    string += users[i];
-                }
-                var userlists = document.getElementsByClassName('userlist');
-                for (let i = 0; i < userlists.length; i++) {
-                    userlists[i].innerHTML = string;
-                }
-                var totals = document.getElementsByClassName('total');
-                for (let i = 0; i < totals.length; i++) {
-                    totals[i].innerHTML = users.length;
-                }
-                break;
+        if(json.hasOwnProperty('instruction')){
+            switch (json['instruction']) {
+                case 'kill':
+                    openLandingPage();
+                    break;
+                case 'list':
+                    var users = json['users'];
+                    var hosts = document.getElementsByClassName('host');
+                    for (let i = 0; i < hosts.length; i++) {
+                        hosts[i].innerHTML = users[0];
+                    }
+                    var string = "";
+                    for (let i = 1; i < users.length; i++) {
+                        if (i != 1) string += ", ";
+                        string += users[i];
+                    }
+                    var userlists = document.getElementsByClassName('userlist');
+                    for (let i = 0; i < userlists.length; i++) {
+                        userlists[i].innerHTML = string;
+                    }
+                    var totals = document.getElementsByClassName('total');
+                    for (let i = 0; i < totals.length; i++) {
+                        totals[i].innerHTML = users.length;
+                    }
+                    break;
+            }
+        }else if(json.hasOwnProperty('result')){
+            document.getElementById("partyid").value = json["result"];
+            hideAllSAAS("page-attendee");
         }
     };
     socket.onclose = function (msg) {
