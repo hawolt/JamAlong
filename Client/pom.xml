@@ -99,6 +99,7 @@
                             <headerType>gui</headerType>
                             <outfile>target/JamAlong.exe</outfile>
                             <jar>target/JamAlong-${version}.jar</jar>
+                            <icon>../Client/src/main/resources/html/assets/Jamalong.ico</icon>
                             <classPath>
                                 <mainClass>com.hawolt.Main</mainClass>
                                 <preCp>anything</preCp>
@@ -115,14 +116,14 @@
                             </jre>
                             <versionInfo>
                                 <fileVersion>
-                                    ${version}
+                                    1.0.0.0
                                 </fileVersion>
                                 <fileDescription>JamAlong</fileDescription>
                                 <productVersion>
-                                    ${version}
+                                    1.0.0.0
                                 </productVersion>
                                 <txtProductVersion>
-                                    ${version}
+                                    1.0.0.0
                                 </txtProductVersion>
                                 <copyright>Hawolt ™</copyright>
                                 <productName>JamAlong</productName>
