@@ -150,6 +150,6 @@ public class RichPresence implements Runnable, InstructionListener {
     public void onInstruction(JSONObject object) {
         if (!"list".equals(object.getString("instruction"))) return;
         this.partySize = object.getJSONArray("users").length();
-        set(LocalExecutor.PARTY_ID);
+        if (LocalExecutor.PARTY_ID != null) set(LocalExecutor.PARTY_ID);
     }
 }
