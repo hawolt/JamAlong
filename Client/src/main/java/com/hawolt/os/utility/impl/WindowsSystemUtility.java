@@ -1,6 +1,7 @@
 package com.hawolt.os.utility.impl;
 
 
+import com.hawolt.logger.Logger;
 import com.hawolt.os.process.ProcessReference;
 import com.hawolt.os.process.impl.WindowsProcess;
 import com.hawolt.os.utility.BasicSystemUtility;
@@ -19,7 +20,7 @@ public class WindowsSystemUtility extends BasicSystemUtility {
 
     @Override
     public List<ProcessReference> getProcessList() throws IOException {
-        ProcessBuilder builder = new ProcessBuilder("WMIC", "path", "win32_process", "get", "Caption,Processid");
+        ProcessBuilder builder = new ProcessBuilder("WMIC", "path", "win32_process", "get", "Caption,Processid,Commandline");
         builder.redirectErrorStream(true);
         Process process = builder.start();
         List<ProcessReference> references = new ArrayList<>();
@@ -33,5 +34,10 @@ public class WindowsSystemUtility extends BasicSystemUtility {
             }
         }
         return references;
+    }
+
+    @Override
+    public void kill(int pid) throws IOException {
+        Runtime.getRuntime().exec("TASKKILL /F /IM " + pid);
     }
 }

@@ -56,6 +56,11 @@ public class SystemManager implements SystemUtility {
     }
 
     @Override
+    public void kill(int pid) throws IOException {
+        get().kill(pid);
+    }
+
+    @Override
     public String translate(String path) {
         return get().translate(path);
     }

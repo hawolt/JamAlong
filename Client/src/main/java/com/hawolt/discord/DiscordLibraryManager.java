@@ -1,10 +1,17 @@
 package com.hawolt.discord;
 
+import com.hawolt.io.Core;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -13,7 +20,10 @@ import java.util.zip.ZipInputStream;
  * An examples showing how to automatically download, extract and load
  * Discord's native library.
  */
+
 public class DiscordLibraryManager {
+    private static final long BYTE_COUNT = 22808634L;
+
     public static File downloadDiscordLibrary() throws IOException {
         // Find out which name Discord's library has (.dll for Windows, .so for Linux)
         String name = "discord_game_sdk";
@@ -43,11 +53,31 @@ public class DiscordLibraryManager {
         // Path of Discord's library inside the ZIP
         String zipPath = "lib/" + arch + "/" + name + suffix;
 
-        // Open the URL as a ZipInputStream
-        URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip");
-        HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
-        connection.setRequestProperty("User-Agent", "discord-game-sdk4j (https://github.com/JnCrMx/discord-game-sdk4j)");
-        ZipInputStream zin = new ZipInputStream(connection.getInputStream());
+        Path path = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jamalong");
+        Path sdk = path.resolve("discord_game_sdk.zip");
+        Files.createDirectories(path);
+        ByteArrayOutputStream byteArrayOutputStream;
+        ZipInputStream zin = null;
+        boolean corrupt = false;
+        if (sdk.toFile().exists()) {
+            byte[] b = Files.readAllBytes(sdk);
+            zin = new ZipInputStream(new ByteArrayInputStream(b));
+            corrupt = b.length != BYTE_COUNT;
+        }
+        if (corrupt || !sdk.toFile().exists()) {
+            // Open the URL as a ZipInputStream
+            URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip");
+            HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
+            connection.setRequestProperty("User-Agent", "discord-game-sdk4j");
+            byteArrayOutputStream = Core.read(connection.getInputStream());
+            Files.write(
+                    sdk,
+                    byteArrayOutputStream.toByteArray(),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING
+            );
+            zin = new ZipInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        }
 
         // Search for the right file inside the ZIP
         ZipEntry entry;

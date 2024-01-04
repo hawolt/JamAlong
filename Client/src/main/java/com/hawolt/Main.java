@@ -8,25 +8,26 @@ import com.hawolt.io.Core;
 import com.hawolt.io.JsonSource;
 import com.hawolt.io.RunLevel;
 import com.hawolt.logger.Logger;
-import com.hawolt.os.OperatingSystem;
-import com.hawolt.registry.Elevator;
-import com.hawolt.registry.ProcessExecutor;
-import com.hawolt.registry.RegisterCustomProtocol;
-import com.hawolt.registry.RegistryPermissionException;
+import com.hawolt.os.SystemManager;
+import com.hawolt.os.process.ProcessReference;
+import com.hawolt.os.process.impl.WindowsProcess;
 import com.hawolt.source.impl.AbstractAudioSource;
 import com.hawolt.source.impl.SoundcloudAudioSource;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.net.URISyntaxException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class Main {
     private static final String[] REQUIRED_VM_OPTIONS = new String[]{
@@ -70,8 +71,29 @@ public class Main {
         return new ProcessBuilder(command);
     }
 
+    private static final ExecutorService service = Executors.newSingleThreadExecutor();
+
+    private static void singletonInstance() {
+        try {
+            ServerSocket socket = new ServerSocket(StaticConstant.SELF_PORT);
+            service.execute(() -> {
+                do {
+                    try {
+                        socket.accept();
+                    } catch (IOException e) {
+                        Logger.error(e);
+                    }
+                } while (!Thread.currentThread().isInterrupted());
+            });
+        } catch (IOException e) {
+            System.exit(1);
+        }
+    }
+
+    public static Optional<RichPresence> presence;
+
     public static void main(String[] args) {
-        boolean elevated = args.length > 0 && args[0].equals("elevate");
+        Main.singletonInstance();
         try {
             JsonSource source = JsonSource.of(Core.read(RunLevel.get("project.json")).toString());
             Logger.info("Writing log for JamAlong-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
@@ -110,21 +132,9 @@ public class Main {
                         })
                         .routes(() -> LocalExecutor.configure(websocketPort, playbackHandler, source, remoteClient))
                         .start(webserverPort);
-
-                try {
-                    switch (OperatingSystem.getOperatingSystemType()) {
-                        case WINDOWS -> Elevator.addRegistryKeyOrElevate("jamalong", elevated);
-                    }
-                } catch (Exception e) {
-                    Logger.error(e);
-                    if (RunLevel.getLevel(Main.class) != RunLevel.FILE) {
-                        System.exit(2);
-                    }
-                }
-
-                Optional<RichPresence> presence = RichPresence.create();
                 SocketServer.launch(websocketPort);
                 Jamalong.create(webserverPort, useOSR);
+                Main.presence = RichPresence.create(remoteClient, playbackHandler);
             } catch (IOException e) {
                 Logger.error(e);
                 System.err.println("Unable to launch Jamalong, exiting (1).");

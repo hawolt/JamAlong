@@ -33,4 +33,9 @@ public class LinuxSystemUtility extends BasicSystemUtility {
         }
         return references;
     }
+
+    @Override
+    public void kill(int pid) throws IOException {
+
+    }
 }

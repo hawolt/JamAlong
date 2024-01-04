@@ -1,10 +1,12 @@
 package com.hawolt.chromium;
 
 import com.hawolt.HostType;
+import com.hawolt.Main;
 import com.hawolt.PlaybackHandler;
 import com.hawolt.RemoteClient;
 import com.hawolt.audio.SystemAudio;
 import com.hawolt.common.Pair;
+import com.hawolt.discord.RichPresence;
 import com.hawolt.logger.Logger;
 import com.hawolt.source.Audio;
 import com.hawolt.source.AudioSource;
@@ -14,6 +16,7 @@ import io.javalin.http.Context;
 import org.json.JSONObject;
 
 import java.util.Base64;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
@@ -31,7 +34,11 @@ public class LocalExecutor {
 
     public static long RESET_TIMESTAMP;
 
-    public static void configure(int websocketPort, PlaybackHandler playbackHandler, AbstractAudioSource source, RemoteClient remoteClient) {
+    public static void configure(
+            int websocketPort,
+            PlaybackHandler playbackHandler,
+            AbstractAudioSource source,
+            RemoteClient remoteClient) {
         path("/v1", () -> {
             path("/config", () -> {
                 get("/skip", context -> playbackHandler.skip());
@@ -66,6 +73,7 @@ public class LocalExecutor {
         PlaybackHandler playbackHandler = pair.getV();
         JSONObject object = remoteClient.executeBlocking("create");
         LocalExecutor.PARTY_ID = object.getString("result").split(" ")[0];
+        Main.presence.ifPresent(presence -> presence.setPartyPresence("Hosting", LocalExecutor.PARTY_ID, LocalExecutor.PARTY_ID));
         context.result(object.toString());
         playbackHandler.addStreamUpdateListener(new StreamUpdateListener() {
             @Override
@@ -91,25 +99,35 @@ public class LocalExecutor {
             }
         });
     };
-    private static BiConsumer<Context, Pair<RemoteClient, PlaybackHandler>> JOIN = (context, pair) -> {
+
+    public static JSONObject join(RemoteClient remoteClient, PlaybackHandler playbackHandler, String partyId) {
         LocalExecutor.HOST_TYPE = HostType.ATTENDEE;
-        RemoteClient remoteClient = pair.getK();
-        PlaybackHandler playbackHandler = pair.getV();
         JSONObject object = remoteClient.executeBlocking(
                 "join",
-                context.pathParam("partyId")
+                partyId
         );
-        context.result(object.toString());
         String[] arguments = object.getString("result").split(" ");
-        if (arguments.length == 0) return;
-        LocalExecutor.PARTY_ID = arguments[0];
-        playbackHandler.clearStreamUpdateListeners();
-        if (arguments.length == 1) return;
-        playbackHandler.setTimestamp(Long.parseLong(arguments[1]));
-        AudioSource source = playbackHandler.getAudioSource();
-        source.load(arguments[2]);
-        if (arguments.length == 3) return;
-        source.preload(arguments[3]);
+        if (arguments.length > 0) {
+            LocalExecutor.PARTY_ID = arguments[0];
+            Main.presence.ifPresent(presence -> presence.setPartyPresence("Listening", LocalExecutor.PARTY_ID, LocalExecutor.PARTY_ID));
+            playbackHandler.clearStreamUpdateListeners();
+            if (arguments.length > 2) {
+                playbackHandler.setTimestamp(Long.parseLong(arguments[1]));
+                AudioSource source = playbackHandler.getAudioSource();
+                source.load(arguments[2]);
+                if (arguments.length > 3) {
+                    source.preload(arguments[3]);
+                }
+            }
+        }
+        return object;
+    }
+
+    private static BiConsumer<Context, Pair<RemoteClient, PlaybackHandler>> JOIN = (context, pair) -> {
+        RemoteClient remoteClient = pair.getK();
+        PlaybackHandler playbackHandler = pair.getV();
+        String partyId = context.pathParam("partyId");
+        context.result(join(remoteClient, playbackHandler, partyId).toString());
     };
 
     private static BiConsumer<Context, RemoteClient> NAMECHANGE = (context, remoteClient) -> {
@@ -121,6 +139,7 @@ public class LocalExecutor {
         context.result(object.toString());
     };
     private static BiConsumer<Context, RemoteClient> DISCOVER = (context, remoteClient) -> {
+        Main.presence.ifPresent(presence -> presence.setIdlePresence());
         JSONObject object = remoteClient.executeBlocking(
                 "discover"
         );

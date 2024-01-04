@@ -28,5 +28,7 @@ public interface SystemUtility {
 
     boolean isProcessRunning(String name) throws IOException;
 
+    void kill(int pid) throws IOException;
+
     String translate(String path);
 }

@@ -19,7 +19,7 @@ public class SystemAudio {
     public static AudioOutputDevice SELECTED_MIXER;
     public static SourceDataLine sourceDataLine;
     public static AudioFormat audioFormat;
-    public static float gain;
+    public static float gain = -40f;
 
     static {
         for (Mixer.Info mixerInfo : AudioSystem.getMixerInfo()) {
