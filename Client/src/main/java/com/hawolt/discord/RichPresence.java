@@ -10,8 +10,6 @@ import com.hawolt.os.SystemManager;
 import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityType;
-import de.jcm.discordgamesdk.user.DiscordUser;
-import de.jcm.discordgamesdk.user.Relationship;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -21,7 +19,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
-public class RichPresence implements Runnable {
+public class RichPresence implements Runnable, InstructionListener {
     public static Optional<RichPresence> create(RemoteClient remoteClient, PlaybackHandler playbackHandler) {
         String processName = switch (OperatingSystem.getOperatingSystemType()) {
             case MAC -> "Discord.app";
@@ -66,7 +64,7 @@ public class RichPresence implements Runnable {
                     public void onActivityJoin(String secret) {
                         Logger.debug("onActivityJoin:{}", secret);
                         if (core == null) return;
-                        setPartyPresence("Listening", secret, secret);
+                        set(secret);
                         JSONObject kill = new JSONObject();
                         kill.put("instruction", "kill");
                         SocketServer.forward(kill.toString());
@@ -121,33 +119,37 @@ public class RichPresence implements Runnable {
     }
 
     public void setIdlePresence() {
-        this.set("Idle", "we love music", reference, null, null);
+        this.set(null);
     }
 
+    private int partySize;
 
-    public void set(String details, String state) {
-        this.set(details, state, null, null, null);
-    }
-
-    public void setPartyPresence(String mode, String id, String secret) {
-        this.set(mode, "we love music", reference, id, secret);
-    }
-
-    public void set(String details, String state, Instant instant, String id, String secret) {
+    public void set(String secret) {
         try (Activity activity = new Activity()) {
             activity.assets().setLargeImage("logo");
-            activity.setType(ActivityType.PLAYING);
-            activity.setDetails(details);
-
-            if (id != null && secret != null) {
+            activity.setType(ActivityType.LISTENING);
+            String state = LocalExecutor.HOST_TYPE == HostType.HOST ? "Hosting" :
+                    LocalExecutor.HOST_TYPE == HostType.ATTENDEE ? "Listening" : "Idle";
+            activity.setDetails(state);
+            String details = partySize > 1 ? "Jamming" :
+                    !"Idle".equals(state) ? "Alone" : "Not Listening";
+            activity.setState(details);
+            if (secret != null) {
                 activity.party().setID(SHA256.hash(secret));
-                activity.party().size().setCurrentSize(1);
+                activity.party().size().setCurrentSize(Math.max(1, partySize));
                 activity.party().size().setMaxSize(100);
                 activity.secrets().setJoinSecret(secret);
             }
 
-            if (instant != null) activity.timestamps().setStart(instant);
+            if (reference != null) activity.timestamps().setStart(reference);
             core.activityManager().updateActivity(activity);
         }
+    }
+
+    @Override
+    public void onInstruction(JSONObject object) {
+        if (!"list".equals(object.getString("instruction"))) return;
+        this.partySize = object.getJSONArray("users").length();
+        set(LocalExecutor.PARTY_ID);
     }
 }

@@ -135,6 +135,7 @@ public class Main {
                 SocketServer.launch(websocketPort);
                 Jamalong.create(webserverPort, useOSR);
                 Main.presence = RichPresence.create(remoteClient, playbackHandler);
+                Main.presence.ifPresent(remoteClient::addInstructionListener);
             } catch (IOException e) {
                 Logger.error(e);
                 System.err.println("Unable to launch Jamalong, exiting (1).");

@@ -73,7 +73,7 @@ public class LocalExecutor {
         PlaybackHandler playbackHandler = pair.getV();
         JSONObject object = remoteClient.executeBlocking("create");
         LocalExecutor.PARTY_ID = object.getString("result").split(" ")[0];
-        Main.presence.ifPresent(presence -> presence.setPartyPresence("Hosting", LocalExecutor.PARTY_ID, LocalExecutor.PARTY_ID));
+        Main.presence.ifPresent(presence -> presence.set(LocalExecutor.PARTY_ID));
         context.result(object.toString());
         playbackHandler.addStreamUpdateListener(new StreamUpdateListener() {
             @Override
@@ -109,7 +109,7 @@ public class LocalExecutor {
         String[] arguments = object.getString("result").split(" ");
         if (arguments.length > 0) {
             LocalExecutor.PARTY_ID = arguments[0];
-            Main.presence.ifPresent(presence -> presence.setPartyPresence("Listening", LocalExecutor.PARTY_ID, LocalExecutor.PARTY_ID));
+            Main.presence.ifPresent(presence -> presence.set(LocalExecutor.PARTY_ID));
             playbackHandler.clearStreamUpdateListeners();
             if (arguments.length > 2) {
                 playbackHandler.setTimestamp(Long.parseLong(arguments[1]));

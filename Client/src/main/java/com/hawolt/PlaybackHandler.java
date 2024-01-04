@@ -16,10 +16,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -91,7 +88,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                         Logger.debug("seek:{}", success);
                     }, LocalExecutor.PARTY_ID, String.valueOf(System.currentTimeMillis()));
                 }
-
+                Main.presence.ifPresent(presence -> presence.set(LocalExecutor.PARTY_ID));
                 checkSkipList();
                 while (SystemAudio.sourceDataLine.isOpen() && (read = audioInputStream.read(buffer, 0, buffer.length)) != -1) {
                     checkSkipList();
