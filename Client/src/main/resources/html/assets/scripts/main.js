@@ -247,7 +247,7 @@ function connect(host) {
                     break;
             }
         }else if(json.hasOwnProperty('result')){
-            document.getElementById("partyid").value = json["result"];
+            document.getElementById("partyid").value = json["result"].split(" ")[0];
             hideAllSAAS("page-attendee");
         }
     };
