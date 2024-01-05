@@ -12,6 +12,7 @@ import com.hawolt.io.Core;
 import com.hawolt.io.JsonSource;
 import com.hawolt.io.RunLevel;
 import com.hawolt.logger.Logger;
+import com.hawolt.misc.Debouncer;
 import com.hawolt.settings.ClientSettings;
 import com.hawolt.settings.SettingManager;
 import com.hawolt.source.impl.AbstractAudioSource;
@@ -105,6 +106,7 @@ public class Main {
         }
     }
 
+    public static Debouncer debouncer = new Debouncer();
     public static Optional<RichPresence> presence;
     public static String version;
 
@@ -127,9 +129,7 @@ public class Main {
         }
 
         boolean useOSR = arguments.contains("--osr");
-        if (useOSR && !
-
-                validateExportOptions()) {
+        if (useOSR && !validateExportOptions()) {
             try {
                 ProcessBuilder builder = getApplicationRestartCommand(arguments);
                 Logger.info("Restarting with required VM Options");

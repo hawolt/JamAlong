@@ -9,6 +9,7 @@ import com.hawolt.http.Request;
 import com.hawolt.http.Response;
 import com.hawolt.http.misc.DownloadCallback;
 import com.hawolt.logger.Logger;
+import com.hawolt.misc.Debouncer;
 import com.hawolt.settings.SettingManager;
 import com.hawolt.source.Audio;
 import com.hawolt.source.AudioSource;
@@ -33,6 +34,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
@@ -172,8 +174,10 @@ public class LocalExecutor {
 
     private static BiConsumer<Context, SettingManager> GAIN = (context, manager) -> {
         float gain = Float.parseFloat(context.pathParam("value"));
-        manager.write("gain", gain);
         SystemAudio.setGain(gain);
+        Main.debouncer.debounce("gain", () -> {
+            manager.write("gain", gain);
+        }, 200, TimeUnit.MILLISECONDS);
     };
 
     private static JSONObject release;
