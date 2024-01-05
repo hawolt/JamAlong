@@ -63,6 +63,7 @@ window.onload = function () {
 
     const mainpage = document.getElementById("mainpage");
     mainpage.addEventListener("click", function () {
+        reset();
         openLandingPage();
     });
 
@@ -121,7 +122,6 @@ window.onload = function () {
 }
 
 function openLandingPage() {
-    reset();
     configure("idle");
     const settings = document.getElementById("settings");
     settings.dataset.previous = "page-landing";
