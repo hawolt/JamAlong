@@ -1,4 +1,6 @@
 ### CUSTOM ###
+release/*
+jre/*
 .idea/*
 External/src/*
 **/target
