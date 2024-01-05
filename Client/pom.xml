@@ -44,6 +44,11 @@
             <artifactId>soundcloud-downloader</artifactId>
             <version>aec70b554d</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.orphan-oss</groupId>
+            <artifactId>launch4j-maven-plugin</artifactId>
+            <version>launch4j-maven-plugin-2.4.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -77,6 +82,55 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>target/JamAlong.exe</outfile>
+                            <jar>target/JamAlong-${version}.jar</jar>
+                            <icon>../Client/src/main/resources/html/assets/Jamalong.ico</icon>
+                            <classPath>
+                                <mainClass>com.hawolt.Main</mainClass>
+                                <preCp>anything</preCp>
+                            </classPath>
+                            <singleInstance>
+                                <mutexName>JamAlong</mutexName>
+                                <windowTitle>JamAlong</windowTitle>
+                            </singleInstance>
+                            <jre>
+                                <requiresJdk>false</requiresJdk>
+                                <requires64Bit>false</requires64Bit>
+                                <path>%JAVA_HOME%;%PATH%</path>
+                                <minVersion>17</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>
+                                    1.0.0.0
+                                </fileVersion>
+                                <fileDescription>JamAlong</fileDescription>
+                                <productVersion>
+                                    1.0.0.0
+                                </productVersion>
+                                <txtProductVersion>
+                                    1.0.0.0
+                                </txtProductVersion>
+                                <copyright>Hawolt ™</copyright>
+                                <productName>JamAlong</productName>
+                                <internalName>JamAlong</internalName>
+                                <originalFilename>JamAlong.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
