@@ -1,7 +1,29 @@
 const origin = window.location;
 
 window.onload = function () {
+
     configure("idle");
+    setGain();
+
+    fetch(origin + 'v1/config/version')
+        .then((response) => response.text())
+        .then((data) => {
+            if(!data === "true")return;
+            hideAllSAAS("page-updater");
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
+    document.getElementById("decline-update").addEventListener("click", function () {
+        hideAllSAAS("page-landing");
+    });
+
+    document.getElementById("accept-update").addEventListener("click", function () {
+        call(origin + 'v1/config/invoke');
+        hideAllSAAS("page-update");
+    });
+
     fetch(origin + 'v1/config/websocket')
         .then((response) => response.text())
         .then((data) => {
@@ -98,7 +120,7 @@ window.onload = function () {
     });
 }
 
-function openLandingPage(){
+function openLandingPage() {
     reset();
     configure("idle");
     const settings = document.getElementById("settings");
@@ -143,6 +165,17 @@ function call(url) {
 
 function adjustAudioGain(value) {
     call(origin + 'v1/config/gain/' + value);
+}
+
+function setGain() {
+    fetch(origin + 'v1/config/gain')
+        .then((response) => response.text())
+        .then((data) => {
+            document.getElementById("audio-gain").value = data;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 }
 
 function skip() {
@@ -220,8 +253,11 @@ function connect(host) {
     };
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
-        if(json.hasOwnProperty('instruction')){
+        if (json.hasOwnProperty('instruction')) {
             switch (json['instruction']) {
+                case 'download':
+                    updateDownload(json['progress'])
+                    break;
                 case 'kill':
                     openLandingPage();
                     break;
@@ -246,7 +282,7 @@ function connect(host) {
                     }
                     break;
             }
-        }else if(json.hasOwnProperty('result')){
+        } else if (json.hasOwnProperty('result')) {
             document.getElementById("partyid").value = json["result"].split(" ")[0];
             hideAllSAAS("page-attendee");
         }
@@ -299,6 +335,11 @@ function build(owner, partyId, users) {
     roomDiv.appendChild(roomDetailDiv);
 
     return roomDiv;
+}
+
+function updateDownload(progress) {
+    document.getElementById("update").value=progress;
+    document.getElementById("visual").innerHTML=progress+"%";
 }
 
 function copyToClipboard(text) {

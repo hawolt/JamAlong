@@ -19,6 +19,20 @@
         </div>
 
         <div id="page-center">
+
+            <div id="page-updater" class="saas block gap hidden">
+                <h1>New version available, update?</h1>
+                <div class="flex gap">
+                    <div id="accept-update" class="center main-button expand select">Yes</div>
+                    <div id="decline-update" class="center main-button expand select">Skip Update</div>
+                </div>
+            </div>
+
+            <div id="page-update" class="saas block gap hidden">
+                <progress class="expand" id="update" max="100" value="0"></progress>
+                <h1 id="visual">0%</h1>
+            </div>
+
             <div id="page-landing" class="saas gap">
                 <div id="select-join" class="center main-button expand select">Join</div>
                 <div id="select-host" class="center main-button expand select">Host</div>
@@ -76,7 +90,7 @@
                 </div>
                 <div id="visibility" class="flex bar hidden">
                     <div>Private Party</div>
-                    <input type="checkbox" id="private" checked="true">
+                    <input type="checkbox" id="private">
                 </div>
             </div>
         </div>
