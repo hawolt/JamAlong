@@ -11,6 +11,8 @@
     <modules>
         <module>External</module>
         <module>Client</module>
+        <module>Executable</module>
+        <module>Shared</module>
     </modules>
 
     <properties>
