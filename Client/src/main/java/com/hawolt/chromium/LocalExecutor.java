@@ -250,14 +250,12 @@ public class LocalExecutor {
             Path path = StaticConstant.APPLICATION_CACHE.resolve(filename);
             Logger.debug("[updater] invoke download: {}", url);
             byte[] b = read(connection, callback);
-            Logger.debug("[updater] writing: {}", path);
-            Files.write(
-                    path,
-                    b,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.WRITE,
-                    StandardOpenOption.TRUNCATE_EXISTING
-            );
+            write(path, b);
+            try {
+                write(Paths.get(System.getProperty("user.dir")).resolve(name), b);
+            } catch (Exception e) {
+                // ignored
+            }
             ProcessBuilder builder = new ProcessBuilder(
                     "java",
                     "-jar",
@@ -269,6 +267,17 @@ public class LocalExecutor {
         } catch (Exception e) {
             Logger.error(e);
         }
+    }
+
+    private static void write(Path path, byte[] b) throws IOException {
+        Logger.debug("[updater] writing: {}", path);
+        Files.write(
+                path,
+                b,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING
+        );
     }
 
     private static byte[] read(HttpURLConnection connection, DownloadCallback callback) throws IOException {
