@@ -8,7 +8,7 @@ window.onload = function () {
     fetch(origin + 'v1/config/version')
         .then((response) => response.text())
         .then((data) => {
-            if(!data === "true")return;
+            if (data === "false") return;
             hideAllSAAS("page-updater");
         })
         .catch((error) => {
@@ -338,8 +338,8 @@ function build(owner, partyId, users) {
 }
 
 function updateDownload(progress) {
-    document.getElementById("update").value=progress;
-    document.getElementById("visual").innerHTML=progress+"%";
+    document.getElementById("update").value = progress;
+    document.getElementById("visual").innerHTML = progress + "%";
 }
 
 function copyToClipboard(text) {
