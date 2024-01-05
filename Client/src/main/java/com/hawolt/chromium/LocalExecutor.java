@@ -246,7 +246,8 @@ public class LocalExecutor {
             };
             callback.notify(length);
             String name = url.substring(url.lastIndexOf("/") + 1);
-            Path path = Paths.get(System.getProperty("user.dir")).resolve(name);
+            String filename = String.join(".", StaticConstant.PROJECT, "jar");
+            Path path = StaticConstant.APPLICATION_CACHE.resolve(filename);
             Logger.debug("[updater] invoke download: {}", url);
             byte[] b = read(connection, callback);
             Logger.debug("[updater] writing: {}", path);
