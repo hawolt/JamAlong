@@ -1,35 +1,50 @@
 package com.hawolt;
 
+import com.hawolt.audio.SystemAudio;
 import com.hawolt.chromium.Jamalong;
 import com.hawolt.chromium.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
 import com.hawolt.discord.RichPresence;
+import com.hawolt.http.Request;
+import com.hawolt.http.Response;
+import com.hawolt.http.misc.DownloadCallback;
 import com.hawolt.io.Core;
 import com.hawolt.io.JsonSource;
 import com.hawolt.io.RunLevel;
 import com.hawolt.logger.Logger;
-import com.hawolt.os.SystemManager;
-import com.hawolt.os.process.ProcessReference;
-import com.hawolt.os.process.impl.WindowsProcess;
+import com.hawolt.settings.ClientSettings;
+import com.hawolt.settings.SettingManager;
 import com.hawolt.source.impl.AbstractAudioSource;
 import com.hawolt.source.impl.SoundcloudAudioSource;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 public class Main {
+    public static final ExecutorService pool = Executors.newCachedThreadPool();
     private static final String[] REQUIRED_VM_OPTIONS = new String[]{
             "--add-exports=java.desktop/sun.java2d=ALL-UNNAMED",
             "--add-exports=java.desktop/sun.awt=ALL-UNNAMED",
@@ -91,20 +106,30 @@ public class Main {
     }
 
     public static Optional<RichPresence> presence;
+    public static String version;
 
     public static void main(String[] args) {
-        Main.singletonInstance();
+        List<String> arguments = Arrays.asList(args);
+        if (!arguments.contains("--allow-multiple-clients")) {
+            Main.singletonInstance();
+        }
         try {
-            JsonSource source = JsonSource.of(Core.read(RunLevel.get("project.json")).toString());
-            Logger.info("Writing log for JamAlong-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
+            JsonSource source = JsonSource.of(Core.read(RunLevel.get(StaticConstant.PROJECT_DATA)).toString());
+            Main.version = source.getOrDefault("version", "UNKNOWN-VERSION");
+            Logger.info("Writing log for JamAlong-{}", version);
         } catch (IOException e) {
             Logger.error(e);
             System.err.println("Unable to launch JamAlong, exiting (1).");
             System.exit(1);
+        } catch (JSONException e) {
+            Logger.error(e);
+            System.err.println("Unable to check for newer release");
         }
-        List<String> arguments = Arrays.asList(args);
+
         boolean useOSR = arguments.contains("--osr");
-        if (useOSR && !validateExportOptions()) {
+        if (useOSR && !
+
+                validateExportOptions()) {
             try {
                 ProcessBuilder builder = getApplicationRestartCommand(arguments);
                 Logger.info("Restarting with required VM Options");
@@ -120,9 +145,13 @@ public class Main {
             }
         } else {
             try {
+                SettingManager manager = new SettingManager();
+                ClientSettings clientSettings = manager.getClientSettings();
+                String username = clientSettings.getUsername();
                 AbstractAudioSource source = new SoundcloudAudioSource();
-                RemoteClient remoteClient = RemoteClient.createAndConnectClientInstance();
+                RemoteClient remoteClient = RemoteClient.createAndConnectClientInstance(username);
                 PlaybackHandler playbackHandler = PlaybackHandler.start(remoteClient, source);
+                SystemAudio.setGain(clientSettings.getClientVolumeGain());
                 Random random = new Random();
                 int webserverPort = random.nextInt(30000) + 20000;
                 int websocketPort = random.nextInt(30000) + 20000;
@@ -130,7 +159,7 @@ public class Main {
                         .before("/v1/*", context -> {
                             context.header("Access-Control-Allow-Origin", "*");
                         })
-                        .routes(() -> LocalExecutor.configure(websocketPort, playbackHandler, source, remoteClient))
+                        .routes(() -> LocalExecutor.configure(manager, websocketPort, playbackHandler, source, remoteClient))
                         .start(webserverPort);
                 SocketServer.launch(websocketPort);
                 Jamalong.create(webserverPort, useOSR);

@@ -36,6 +36,7 @@ public class Jamalong {
         container.setLayout(new BorderLayout());
         VisualProgressHandler handler = new VisualProgressHandler();
         container.add(handler, BorderLayout.CENTER);
+        frame.setResizable(false);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

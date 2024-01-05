@@ -83,7 +83,6 @@ public class PlaybackHandler implements Runnable, InstructionListener {
 
                 if (LocalExecutor.HOST_TYPE == HostType.HOST) {
                     remoteClient.executeAsynchronous("seek", object -> {
-                        //UNKNOWN_ROOM
                         boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
                         Logger.debug("seek:{}", success);
                     }, LocalExecutor.PARTY_ID, String.valueOf(System.currentTimeMillis()));
@@ -94,12 +93,13 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                     checkSkipList();
                     int offset = getAudioPointerOffset(current.data());
                     if (offset != 0) {
-                        Logger.debug("[player] seek to {}", offset);
+                        Logger.debug("[player] seek to {} of {}", offset, current.data().length);
                         audioInputStream.skip(offset);
                         continue;
                     }
                     SystemAudio.sourceDataLine.write(buffer, 0, read);
                 }
+                Logger.debug("stopped playing {}", current.name());
                 SystemAudio.closeSourceDataLine();
                 audioInputStream.close();
             } catch (InterruptedException | UnsupportedAudioFileException | IOException e) {

@@ -1,5 +1,6 @@
 package com.hawolt.discord;
 
+import com.hawolt.StaticConstant;
 import com.hawolt.io.Core;
 
 import java.io.ByteArrayInputStream;
@@ -53,7 +54,7 @@ public class DiscordLibraryManager {
         // Path of Discord's library inside the ZIP
         String zipPath = "lib/" + arch + "/" + name + suffix;
 
-        Path path = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jamalong");
+        Path path = StaticConstant.APPLICATION_CACHE;
         Path sdk = path.resolve("discord_game_sdk.zip");
         Files.createDirectories(path);
         ByteArrayOutputStream byteArrayOutputStream;

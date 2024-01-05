@@ -1,7 +1,6 @@
 package com.hawolt;
 
 import com.hawolt.logger.Logger;
-import com.hawolt.source.impl.AbstractAudioSource;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONException;
@@ -17,11 +16,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class RemoteClient extends WebSocketClient {
-    private static String host = "ws://hawolt.com:48157/?sudo=false&name=anon";
+    private static String host = "ws://hawolt.com:48157/?sudo=false&name=%s";
 
-    public static RemoteClient createAndConnectClientInstance() {
+    public static RemoteClient createAndConnectClientInstance(String username) {
         try {
-            URI uri = new URI(host);
+            URI uri = new URI(String.format(host, username));
             RemoteClient client = new RemoteClient(uri);
             client.connect();
             return client;
