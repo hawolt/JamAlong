@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>Client</artifactId>
-    <version>1.14</version>
+    <version>1.15</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.github.hawolt</groupId>
             <artifactId>soundcloud-downloader</artifactId>
-            <version>6270bfb626</version>
+            <version>aec70b554d</version>
         </dependency>
     </dependencies>
 
