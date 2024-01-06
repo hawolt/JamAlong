@@ -5,6 +5,9 @@ import com.hawolt.audio.AudioManager;
 import com.hawolt.audio.AudioSystemWrapper;
 import com.hawolt.chromium.SocketServer;
 import com.hawolt.common.Pair;
+import com.hawolt.data.media.hydratable.impl.track.Track;
+import com.hawolt.data.media.search.Explorer;
+import com.hawolt.data.media.search.query.impl.SearchQuery;
 import com.hawolt.discord.RichPresence;
 import com.hawolt.http.BasicHttp;
 import com.hawolt.http.Request;
@@ -32,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Base64;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -89,8 +93,22 @@ public class LocalExecutor implements DownloadCallback {
         if (url == null) context.result("NO_URL");
         else {
             String plain = new String(Base64.getDecoder().decode(url.getBytes()));
-            application.getAudioSource().load(plain);
-            context.result(plain);
+            if (plain.startsWith("https")) {
+                application.getAudioSource().load(plain);
+                context.result(plain);
+            } else {
+                SearchQuery query = new SearchQuery(plain);
+                try {
+                    Iterator<Track> iterator = Explorer.browse(query).iterator();
+                    if (iterator.hasNext()) {
+                        String link = iterator.next().getLink();
+                        application.getAudioSource().load(link);
+                        context.result(link);
+                    }
+                } catch (Exception e) {
+                    Logger.error(e);
+                }
+            }
         }
     };
 
