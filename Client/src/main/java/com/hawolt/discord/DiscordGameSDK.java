@@ -2,6 +2,7 @@ package com.hawolt.discord;
 
 import com.hawolt.StaticConstant;
 import com.hawolt.io.Core;
+import com.hawolt.os.OperatingSystem;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,61 +12,43 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- *
+ * Utility class to download and cache the Discord Game SDK .
  */
 
-public class DiscordLibraryManager {
+public class DiscordGameSDK {
     private static final long BYTE_COUNT = 22808634L;
 
-    public static File downloadDiscordLibrary() throws IOException {
-        // Find out which name Discord's library has (.dll for Windows, .so for Linux)
-        String name = "discord_game_sdk";
-        String suffix;
-
-        String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-        String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
-
-        if (osName.contains("windows")) {
-            suffix = ".dll";
-        } else if (osName.contains("linux")) {
-            suffix = ".so";
-        } else if (osName.contains("mac os")) {
-            suffix = ".dylib";
-        } else {
-            throw new RuntimeException("cannot determine OS type: " + osName);
+    public static File loadFromCacheOrDownload() throws IOException {
+        String libraryBaseName = "discord_game_sdk";
+        String suffix = switch (OperatingSystem.getOperatingSystemType()) {
+            case WINDOWS -> ".dll";
+            case MAC -> ".dylib";
+            case LINUX -> ".so";
+            case UNKNOWN -> throw new RuntimeException("Unable to determine OSType");
+        };
+        String operatingSystemArchitecture = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+        if (operatingSystemArchitecture.equals("amd64")) {
+            operatingSystemArchitecture = "x86_64";
         }
-
-		/*
-		Some systems report "amd64" (e.g. Windows and Linux), some "x86_64" (e.g. Mac OS).
-		At this point we need the "x86_64" version, as this one is used in the ZIP.
-		 */
-        if (arch.equals("amd64")) {
-            arch = "x86_64";
-        }
-
-        // Path of Discord's library inside the ZIP
-        String zipPath = "lib/" + arch + "/" + name + suffix;
-
+        String pathWithinArchive = "lib/" + operatingSystemArchitecture + "/" + libraryBaseName + suffix;
         Path path = StaticConstant.APPLICATION_CACHE;
         Path sdk = path.resolve("discord_game_sdk.zip");
         Files.createDirectories(path);
         ByteArrayOutputStream byteArrayOutputStream;
-        ZipInputStream zin = null;
+        ZipInputStream archive = null;
         boolean corrupt = false;
         if (sdk.toFile().exists()) {
             byte[] b = Files.readAllBytes(sdk);
-            zin = new ZipInputStream(new ByteArrayInputStream(b));
+            archive = new ZipInputStream(new ByteArrayInputStream(b));
             corrupt = b.length != BYTE_COUNT;
         }
         if (corrupt || !sdk.toFile().exists()) {
-            // Open the URL as a ZipInputStream
             URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip");
             HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
             connection.setRequestProperty("User-Agent", "discord-game-sdk4j");
@@ -76,38 +59,23 @@ public class DiscordLibraryManager {
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING
             );
-            zin = new ZipInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+            archive = new ZipInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
         }
-
-        // Search for the right file inside the ZIP
         ZipEntry entry;
-        while ((entry = zin.getNextEntry()) != null) {
-            if (entry.getName().equals(zipPath)) {
-                // Create a new temporary directory
-                // We need to do this, because we may not change the filename on Windows
-                File tempDir = new File(System.getProperty("java.io.tmpdir"), "java-" + name + System.nanoTime());
-                if (!tempDir.mkdir())
-                    throw new IOException("Cannot create temporary directory");
+        while ((entry = archive.getNextEntry()) != null) {
+            if (entry.getName().equals(pathWithinArchive)) {
+                File tempDir = new File(System.getProperty("java.io.tmpdir"), "java-" + libraryBaseName + System.nanoTime());
+                if (!tempDir.mkdir()) throw new IOException("Cannot create temporary directory");
                 tempDir.deleteOnExit();
-
-                // Create a temporary file inside our directory (with a "normal" name)
-                File temp = new File(tempDir, name + suffix);
-                temp.deleteOnExit();
-
-                // Copy the file in the ZIP to our temporary file
-                Files.copy(zin, temp.toPath());
-
-                // We are done, so close the input stream
-                zin.close();
-
-                // Return our temporary file
-                return temp;
+                File tmp = new File(tempDir, libraryBaseName + suffix);
+                tmp.deleteOnExit();
+                Files.copy(archive, tmp.toPath());
+                archive.close();
+                return tmp;
             }
-            // next entry
-            zin.closeEntry();
+            archive.closeEntry();
         }
-        zin.close();
-        // We couldn't find the library inside the ZIP
-        return null;
+        archive.close();
+        throw new IOException("Unable to locate the required files");
     }
 }

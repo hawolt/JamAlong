@@ -20,8 +20,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Wrapper class for the JCEF framework to provide a Chromium Window.
+ */
 public class Chromium {
-    private final Path base = Paths.get(System.getProperty("user.home")).resolve(".jamalong");
+    private final Path base = Paths.get(System.getProperty("user.home")).resolve(".hawolt").resolve(".chrome");
 
     private final CefApp cefApp_;
     private final CefClient client_;

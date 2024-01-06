@@ -5,6 +5,11 @@ import java.util.Locale;
 public class OperatingSystem {
     protected static OSType detectedOS;
 
+    /**
+     * used to determine the current Operating System the application is running on
+     *
+     * @return the type of the current operating system
+     */
     public static OSType getOperatingSystemType() {
         if (detectedOS == null) {
             String OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
