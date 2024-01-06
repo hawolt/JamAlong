@@ -5,6 +5,9 @@ import me.friwi.jcefmaven.IProgressHandler;
 
 import java.awt.*;
 
+/**
+ * Graphical component that displays the download status for JCEF.
+ */
 public class VisualProgressHandler extends Graphics2DComponent implements IProgressHandler {
 
     private final Color _BACKGROUND = new Color(54, 51, 51);
@@ -49,5 +52,4 @@ public class VisualProgressHandler extends Graphics2DComponent implements IProgr
         this.f = f;
         this.repaint();
     }
-
 }

@@ -2,6 +2,10 @@ package com.hawolt.chromium;
 
 import javax.swing.*;
 import java.awt.*;
+
+/**
+ * Graphical abstract component that defaults to Antialiasing.
+ */
 public abstract class Graphics2DComponent extends JComponent {
 
     @Override

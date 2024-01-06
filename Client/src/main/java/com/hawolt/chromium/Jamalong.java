@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Graphical main component for JamAlong.
+ */
 public class Jamalong {
     public static JFrame frame;
 
