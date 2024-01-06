@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>Client</artifactId>
-    <version>1.17</version>
+    <version>1.171</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
