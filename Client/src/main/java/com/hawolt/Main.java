@@ -81,8 +81,6 @@ public class Main {
             application.getRichPresence().ifPresent(presence -> {
                 application.getRemoteClient().addInstructionListener(presence);
             });
-            application.setGracefulShutdown(true);
-            application.getServerSocket().close();
         } catch (IOException | AudioMixerUnavailableException | InterruptedException e) {
             Logger.error(e);
             System.err.println("Unable to launch Jamalong, exiting (1).");
