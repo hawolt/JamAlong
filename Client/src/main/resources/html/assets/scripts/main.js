@@ -250,10 +250,12 @@ function connect(host) {
     let socket = new WebSocket(host);
     socket.onopen = function (msg) {
         console.log("Connected to " + host);
+        hideAllSAAS("page-landing");
     };
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
         if (json.hasOwnProperty('instruction')) {
+            console.log(json);
             switch (json['instruction']) {
                 case 'download':
                     updateDownload(json['progress'])
