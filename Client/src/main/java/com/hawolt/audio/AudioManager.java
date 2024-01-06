@@ -31,6 +31,7 @@ public class AudioManager implements Runnable, InstructionListener {
     private final RemoteClient remoteClient;
     private final AudioSystemWrapper audio;
     private final Application application;
+    private boolean gatekeeper = true;
     private long timestamp;
     private Audio current;
 
@@ -79,6 +80,7 @@ public class AudioManager implements Runnable, InstructionListener {
                     next.ifPresent(listener::onAudioPeekUpdate);
                 }
                 Logger.debug("[audio-player] now playing: {}", current.name());
+                if (!gatekeeper) revealCurrentlyPlayingSong();
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(current.data());
 
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
@@ -123,6 +125,20 @@ public class AudioManager implements Runnable, InstructionListener {
         } while (true);
     }
 
+    private void revealCurrentlyPlayingSong() {
+        JSONObject track = new JSONObject();
+        track.put("instruction", "reveal");
+        track.put("name", current.name());
+        application.getSocketServer().forward(track.toString());
+    }
+
+    private void hideCurrentlyPlayingSong() {
+        JSONObject track = new JSONObject();
+        track.put("instruction", "reveal");
+        track.put("name", "");
+        application.getSocketServer().forward(track.toString());
+    }
+
     private void checkSkipList() {
         if (!skip.contains(current.source())) return;
         Logger.debug("[player] skip {}", current.source());
@@ -163,11 +179,24 @@ public class AudioManager implements Runnable, InstructionListener {
         this.timestamp = timestamp;
     }
 
+    public Audio getCurrent() {
+        return current;
+    }
+
     @Override
     public void onInstruction(JSONObject object) {
         SocketServer socketServer = application.getSocketServer();
         String instruction = object.getString("instruction");
         switch (instruction) {
+            case "gatekeeper":
+                socketServer.forward(object.toString());
+                this.gatekeeper = object.getBoolean("status");
+                if (!gatekeeper && current != null) revealCurrentlyPlayingSong();
+                else hideCurrentlyPlayingSong();
+                break;
+            case "reset-gatekeeper":
+                this.gatekeeper = true;
+                break;
             case "skip":
                 String toSkip = object.getString("track");
                 this.skip.add(toSkip);
@@ -176,8 +205,9 @@ public class AudioManager implements Runnable, InstructionListener {
                 socketServer.forward(object.toString());
                 break;
             case "close":
-                socketServer.forward(object.toString());
+                this.source.clear();
                 this.audio.closeSourceDataLine();
+                socketServer.forward(object.toString());
                 break;
             case "seek":
                 this.timestamp = object.getLong("timestamp");
