@@ -11,6 +11,7 @@ import com.hawolt.data.media.search.Explorer;
 import com.hawolt.data.media.search.query.ObjectCollection;
 import com.hawolt.data.media.search.query.impl.TrackQuery;
 import com.hawolt.logger.Logger;
+import com.hawolt.media.Audio;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
@@ -80,6 +81,18 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
             this.loading.add(link);
             this.load(link);
         }
+    }
+
+    /**
+     * clears all available queues
+     */
+    @Override
+    public void clear() {
+        this.cache.clear();
+        this.pending.clear();
+        this.loading.clear();
+        this.preload.clear();
+        this.getCurrentQueue().clear();
     }
 
     /**
@@ -183,7 +196,6 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
      * @param track the reference object containing metadata for the specified track
      */
     public void onTrackData(String link, Track track) {
-        Logger.debug("TRACK DATA {}", track);
         if (isCurrentlyPending(link)) {
             this.decrementCurrentlyLoadingReferences();
             this.removePendingLoadReference(link);

@@ -13,14 +13,14 @@ public abstract class AbstractAudioSource implements AudioSource {
     @Override
     public void push(Audio audio) {
         Logger.debug("pushing: {}", audio.name());
-        list.push(audio);
+        list.add(audio);
     }
 
     @Override
     public Audio pop() {
         Audio audio = list.isEmpty() ? null : list.remove(0);
         if (audio != null) Logger.debug("popping: {}", audio.name());
-        if (list.size() <= 1 && getCurrentlyLoadingReferences() == 0) {
+        if (list.size() <= 4 && getCurrentlyLoadingReferences() == 0) {
             loadNextPendingReference();
         }
         return audio;
@@ -51,7 +51,7 @@ public abstract class AbstractAudioSource implements AudioSource {
     }
 
     @Override
-    public void clear() {
-        this.list.clear();
+    public LinkedList<Audio> getCurrentQueue() {
+        return list;
     }
 }
