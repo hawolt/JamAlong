@@ -1,8 +1,10 @@
 package com.hawolt.media;
 
+import java.util.LinkedList;
 import java.util.Optional;
 
 public interface AudioSource {
+    LinkedList<Audio> getCurrentQueue();
 
     Audio await(long interval) throws InterruptedException;
 
