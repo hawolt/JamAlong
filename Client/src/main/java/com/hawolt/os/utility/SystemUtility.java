@@ -1,6 +1,5 @@
 package com.hawolt.os.utility;
 
-
 import com.hawolt.os.process.ProcessReference;
 import com.hawolt.os.process.observer.ProcessCallback;
 import com.hawolt.os.process.observer.ProcessObserver;

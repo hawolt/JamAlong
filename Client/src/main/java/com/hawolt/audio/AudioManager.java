@@ -1,14 +1,19 @@
-package com.hawolt;
+package com.hawolt.audio;
 
-import com.hawolt.audio.SystemAudio;
+import com.hawolt.Application;
+import com.hawolt.Main;
+import com.hawolt.discord.RichPresence;
 import com.hawolt.localhost.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
 import com.hawolt.exceptions.AudioMixerUnavailableException;
 import com.hawolt.logger.Logger;
-import com.hawolt.source.Audio;
-import com.hawolt.source.AudioSource;
-import com.hawolt.source.StreamUpdateListener;
-import com.hawolt.source.impl.AbstractAudioSource;
+import com.hawolt.misc.HostType;
+import com.hawolt.remote.InstructionListener;
+import com.hawolt.remote.RemoteClient;
+import com.hawolt.media.Audio;
+import com.hawolt.media.AudioSource;
+import com.hawolt.media.StreamUpdateListener;
+import com.hawolt.media.impl.AbstractAudioSource;
 import org.json.JSONObject;
 
 import javax.sound.sampled.*;
@@ -18,27 +23,27 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class PlaybackHandler implements Runnable, InstructionListener {
+public class AudioManager implements Runnable, InstructionListener {
     private final ExecutorService service = Executors.newSingleThreadExecutor();
     private final List<StreamUpdateListener> list = new LinkedList<>();
     private final List<String> skip = new ArrayList<>();
-
     private final AbstractAudioSource source;
     private final RemoteClient remoteClient;
-    private final SystemAudio audio;
+    private final AudioSystemWrapper audio;
+    private final Application application;
     private long timestamp;
     private Audio current;
-    private long reset;
 
-    private PlaybackHandler(RemoteClient remoteClient, AbstractAudioSource source) throws AudioMixerUnavailableException {
-        this.source = source;
-        this.audio = new SystemAudio();
-        this.remoteClient = remoteClient;
+    private AudioManager(Application application) throws AudioMixerUnavailableException {
+        this.application = application;
+        this.source = application.getAudioSource();
+        this.audio = new AudioSystemWrapper();
+        this.remoteClient = application.getRemoteClient();
         this.remoteClient.addInstructionListener(this);
     }
 
-    public static PlaybackHandler start(RemoteClient remoteClient, AbstractAudioSource source) throws AudioMixerUnavailableException {
-        PlaybackHandler playbackHandler = new PlaybackHandler(remoteClient, source);
+    public static AudioManager start(Application application) throws AudioMixerUnavailableException {
+        AudioManager playbackHandler = new AudioManager(application);
         playbackHandler.service.execute(playbackHandler);
         return playbackHandler;
     }
@@ -83,13 +88,16 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                 byte[] buffer = new byte[4096];
                 int read;
 
-                if (LocalExecutor.HOST_TYPE == HostType.HOST) {
+                LocalExecutor localExecutor = application.getLocalExecutor();
+                if (localExecutor.getHostType() == HostType.HOST) {
                     remoteClient.executeAsynchronous("seek", object -> {
-                        boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
+                        boolean success = object.getString("result").equals(localExecutor.getPartyId());
                         Logger.debug("seek:{}", success);
-                    }, LocalExecutor.PARTY_ID, String.valueOf(System.currentTimeMillis()));
+                    }, localExecutor.getPartyId(), String.valueOf(System.currentTimeMillis()));
                 }
-                Main.presence.ifPresent(presence -> presence.set(LocalExecutor.PARTY_ID));
+
+                Optional<RichPresence> richPresence = application.getRichPresence();
+                richPresence.ifPresent(presence -> presence.set(localExecutor.getPartyId()));
                 checkSkipList();
                 while (this.audio.sourceDataLine.isOpen() && (read = audioInputStream.read(buffer, 0, buffer.length)) != -1) {
                     checkSkipList();
@@ -139,10 +147,11 @@ public class PlaybackHandler implements Runnable, InstructionListener {
     }
 
     public void skip() {
+        LocalExecutor localExecutor = application.getLocalExecutor();
         remoteClient.executeAsynchronous("skip", object -> {
-            boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
+            boolean success = object.getString("result").equals(localExecutor.getPartyId());
             Logger.debug("skip:{}", success);
-        }, LocalExecutor.PARTY_ID, current.source());
+        }, localExecutor.getPartyId(), current.source());
         this.audio.closeSourceDataLine();
     }
 
@@ -156,6 +165,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
 
     @Override
     public void onInstruction(JSONObject object) {
+        SocketServer socketServer = application.getSocketServer();
         String instruction = object.getString("instruction");
         switch (instruction) {
             case "skip":
@@ -163,10 +173,10 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                 this.skip.add(toSkip);
                 break;
             case "list":
-                SocketServer.forward(object.toString());
+                socketServer.forward(object.toString());
                 break;
             case "close":
-                SocketServer.forward(object.toString());
+                socketServer.forward(object.toString());
                 this.audio.closeSourceDataLine();
                 break;
             case "seek":
@@ -182,7 +192,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
         }
     }
 
-    public SystemAudio getSystemAudio() {
+    public AudioSystemWrapper getSystemAudio() {
         return audio;
     }
 }

@@ -1,12 +1,17 @@
 package com.hawolt.discord;
 
 import com.hawolt.*;
-import com.hawolt.chromium.LocalExecutor;
+import com.hawolt.audio.AudioManager;
+import com.hawolt.localhost.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
 import com.hawolt.cryptography.SHA256;
 import com.hawolt.logger.Logger;
+import com.hawolt.misc.ExecutorManager;
+import com.hawolt.misc.HostType;
 import com.hawolt.os.OperatingSystem;
 import com.hawolt.os.SystemManager;
+import com.hawolt.remote.InstructionListener;
+import com.hawolt.remote.RemoteClient;
 import de.jcm.discordgamesdk.*;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityType;
@@ -20,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 public class RichPresence implements Runnable, InstructionListener {
-    public static Optional<RichPresence> create(RemoteClient remoteClient, PlaybackHandler playbackHandler) {
+    public static Optional<RichPresence> create(Application application) {
         String processName = switch (OperatingSystem.getOperatingSystemType()) {
             case MAC -> "Discord.app";
             case LINUX -> "Discord";
@@ -34,17 +39,21 @@ public class RichPresence implements Runnable, InstructionListener {
         } catch (IOException e) {
             Logger.error(e);
         }
-        return Optional.of(new RichPresence(remoteClient, playbackHandler));
+        return Optional.of(new RichPresence(application));
     }
 
     private final Instant reference = Instant.now();
-    private final PlaybackHandler playbackHandler;
+    private final LocalExecutor localExecutor;
+    private final AudioManager audioManager;
     private final RemoteClient remoteClient;
+    private final SocketServer socketServer;
     private Core core;
 
-    private RichPresence(RemoteClient remoteClient, PlaybackHandler playbackHandler) {
-        this.playbackHandler = playbackHandler;
-        this.remoteClient = remoteClient;
+    private RichPresence(Application application) {
+        this.audioManager = application.getAudioManager();
+        this.remoteClient = application.getRemoteClient();
+        this.socketServer = application.getSocketServer();
+        this.localExecutor = application.getLocalExecutor();
         ExecutorService loader = ExecutorManager.getService("rpc-loader");
         loader.execute(this);
         loader.shutdown();
@@ -53,7 +62,7 @@ public class RichPresence implements Runnable, InstructionListener {
     @Override
     public void run() {
         try {
-            File discordLibrary = DiscordLibraryManager.downloadDiscordLibrary();
+            File discordLibrary = DiscordGameSDK.loadFromCacheOrDownload();
             if (discordLibrary == null) throw new Exception("Failed to download library");
             Core.init(discordLibrary);
             try (CreateParams params = new CreateParams()) {
@@ -67,8 +76,8 @@ public class RichPresence implements Runnable, InstructionListener {
                         set(secret);
                         JSONObject kill = new JSONObject();
                         kill.put("instruction", "kill");
-                        SocketServer.forward(kill.toString());
-                        SocketServer.forward(LocalExecutor.join(remoteClient, playbackHandler, secret).toString());
+                        socketServer.forward(kill.toString());
+                        socketServer.forward(localExecutor.join(remoteClient, audioManager, secret).toString());
                     }
                 });
                 try {
@@ -128,8 +137,8 @@ public class RichPresence implements Runnable, InstructionListener {
         try (Activity activity = new Activity()) {
             activity.assets().setLargeImage("logo");
             activity.setType(ActivityType.LISTENING);
-            String state = LocalExecutor.HOST_TYPE == HostType.HOST ? "Hosting" :
-                    LocalExecutor.HOST_TYPE == HostType.ATTENDEE ? "Listening" : "Idle";
+            String state = localExecutor.getHostType() == HostType.HOST ? "Hosting" :
+                    localExecutor.getHostType() == HostType.ATTENDEE ? "Listening" : "Idle";
             activity.setDetails(state);
             String details = partySize > 1 ? "Jamming" :
                     !"Idle".equals(state) ? "Alone" : "Not Listening";
@@ -150,6 +159,6 @@ public class RichPresence implements Runnable, InstructionListener {
     public void onInstruction(JSONObject object) {
         if (!"list".equals(object.getString("instruction"))) return;
         this.partySize = object.getJSONArray("users").length();
-        if (LocalExecutor.PARTY_ID != null) set(LocalExecutor.PARTY_ID);
+        if (localExecutor.getPartyId() != null) set(localExecutor.getPartyId());
     }
 }

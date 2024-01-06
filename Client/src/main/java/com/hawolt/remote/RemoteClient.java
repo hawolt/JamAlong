@@ -1,4 +1,4 @@
-package com.hawolt;
+package com.hawolt.remote;
 
 import com.hawolt.logger.Logger;
 import org.java_websocket.client.WebSocketClient;

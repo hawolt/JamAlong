@@ -1,6 +1,6 @@
 package com.hawolt.settings;
 
-import com.hawolt.Unsafe;
+import com.hawolt.misc.Unsafe;
 import org.json.JSONObject;
 
 import java.util.function.Supplier;

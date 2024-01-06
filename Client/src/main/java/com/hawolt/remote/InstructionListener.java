@@ -1,4 +1,4 @@
-package com.hawolt;
+package com.hawolt.remote;
 
 import org.json.JSONObject;
 

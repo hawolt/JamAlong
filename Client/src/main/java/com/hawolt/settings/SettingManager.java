@@ -2,7 +2,8 @@ package com.hawolt.settings;
 
 import com.hawolt.Main;
 import com.hawolt.StaticConstant;
-import com.hawolt.Unsafe;
+import com.hawolt.misc.ExecutorManager;
+import com.hawolt.misc.Unsafe;
 import com.hawolt.logger.Logger;
 import org.json.JSONObject;
 
@@ -12,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 public class SettingManager implements SettingService {
     private final Map<String, List<SettingListener<?>>> map = new HashMap<>();
@@ -47,7 +49,8 @@ public class SettingManager implements SettingService {
         List<SettingListener<?>> list = map.get(name);
         if (list == null) return;
         for (SettingListener<?> listener : list) {
-            Main.pool.execute(() -> listener.onSettingWrite(name, Unsafe.cast(value)));
+            ExecutorService service = ExecutorManager.getService("pool");
+            service.execute(() -> listener.onSettingWrite(name, Unsafe.cast(value)));
         }
     }
 

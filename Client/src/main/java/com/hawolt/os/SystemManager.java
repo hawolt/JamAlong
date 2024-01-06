@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class SystemManager implements SystemUtility {
-
     private static final Map<OperatingSystem.OSType, SystemUtility> managers = new HashMap<>();
     private static final SystemManager INSTANCE = new SystemManager();
 

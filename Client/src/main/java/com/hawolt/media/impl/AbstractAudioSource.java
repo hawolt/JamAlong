@@ -1,8 +1,8 @@
-package com.hawolt.source.impl;
+package com.hawolt.media.impl;
 
 import com.hawolt.logger.Logger;
-import com.hawolt.source.Audio;
-import com.hawolt.source.AudioSource;
+import com.hawolt.media.Audio;
+import com.hawolt.media.AudioSource;
 
 import java.util.LinkedList;
 import java.util.Optional;

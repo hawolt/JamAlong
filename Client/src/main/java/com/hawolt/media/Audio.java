@@ -1,4 +1,4 @@
-package com.hawolt.source;
+package com.hawolt.media;
 
 public interface Audio {
     String source();

@@ -1,6 +1,6 @@
-package com.hawolt.source.impl;
+package com.hawolt.media.impl;
 
-import com.hawolt.source.Audio;
+import com.hawolt.media.Audio;
 
 public class SimpleAudio implements Audio {
     private final byte[] bytes;
