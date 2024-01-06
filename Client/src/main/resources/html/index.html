@@ -20,8 +20,8 @@
 
         <div id="page-center">
 
-            <div id="page-blank" class="saas">
-
+            <div id="page-blank" class="saas hidden">
+<i class="fa-solid fa-music fa-2xl"></i>
             </div>
 
             <div id="page-updater" class="saas block gap hidden">
@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <div id="page-attendee" class="saas block hidden">
+            <div id="page-attendee" class="saas block">
                 <div class="flex bar">
                     <div class="flex gap">
                         <div><i class="fa-solid fa-user fa-2xl"></i></div>
@@ -63,6 +63,15 @@
                     </div>
                 </div>
                 <div class="userlist noselect center"></div>
+                <div class="flex bar">
+                    <div id="trackname" class="track"></div>
+                    <div class="gatekeeper">
+                        <i class="fa-solid fa-lock fa-2xl"></i>
+                    </div>
+                    <div id="reveal" class="gatekeeper settings hidden">
+                        <i class="fa-solid fa-music fa-2xl"></i>
+                    </div>
+                </div>
             </div>
 
             <div id="page-host" class="saas block hidden">
@@ -94,9 +103,15 @@
                     <input type="text" id="username" placeholder="username" size="16"/>
                     <div class="main-button shrink-font" id="set-name">set</div>
                 </div>
-                <div id="visibility" class="flex bar hidden">
-                    <div>Private Party</div>
-                    <input type="checkbox" id="private">
+                <div id="visibility" class="block bar hidden">
+                    <div class="flex bar">
+                        <div>Private Party</div>
+                        <input type="checkbox" id="partyVisibility">
+                    </div>
+                    <div class="flex bar">
+                        <div>Show playing Tracks public</div>
+                        <input type="checkbox" id="trackVisibility">
+                    </div>
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@ window.onload = function () {
         .then((response) => response.text())
         .then((data) => {
             if (data === "false") return;
-            hideAllSAAS("page-updater");
+            //hideAllSAAS("page-updater");
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -24,6 +24,10 @@ window.onload = function () {
         hideAllSAAS("page-update");
     });
 
+    document.getElementById("reveal").addEventListener("click", function () {
+        reveal();
+    });
+
     fetch(origin + 'v1/config/websocket')
         .then((response) => response.text())
         .then((data) => {
@@ -34,8 +38,8 @@ window.onload = function () {
         });
 
 
-    const visibility = document.getElementById('visibility');
-    visibility.addEventListener('change', e => {
+    const partyVisibility = document.getElementById('partyVisibility');
+    partyVisibility.addEventListener('change', e => {
         if (e.target.checked === true) {
             togglePartyVisibility(document.getElementById("partyid").value, true);
         }
@@ -44,6 +48,18 @@ window.onload = function () {
         }
     });
 
+    const trackVisibility = document.getElementById('trackVisibility');
+    trackVisibility.addEventListener('change', e => {
+        if (e.target.checked === true) {
+            toggleTrackVisibility(document.getElementById("partyid").value, false);
+        }
+        if (e.target.checked === false) {
+            toggleTrackVisibility(document.getElementById("partyid").value, true);
+        }
+    });
+
+
+    const visibility = document.getElementById('visibility');
     const settings = document.getElementById("settings");
     settings.addEventListener("click", function () {
         if (settings.classList.contains("fa-gear")) {
@@ -237,12 +253,20 @@ function join(partyId) {
         });
 }
 
+function reveal() {
+    call(origin + 'v1/api/reveal');
+}
+
 function load(link) {
     call(origin + 'v1/api/load?url=' + btoa(link));
 }
 
 function togglePartyVisibility(partyId, status) {
     call(origin + 'v1/api/visibility/' + partyId + '/' + status);
+}
+
+function toggleTrackVisibility(partyId, status) {
+    call(origin + 'v1/api/gatekeeper/' + partyId + '/' + status);
 }
 
 
@@ -257,6 +281,18 @@ function connect(host) {
         if (json.hasOwnProperty('instruction')) {
             console.log(json);
             switch (json['instruction']) {
+                case 'gatekeeper':
+                    var gatekeepers = document.getElementsByClassName('gatekeeper');
+                    for (let i = 0; i < gatekeepers.length; i++) {
+                        gatekeepers[i].classList.toggle('hidden');
+                    }
+                    break;
+                case 'reveal':
+                    document.getElementById('trackname').innerHTML=json['name'];
+                    break;
+                case 'close':
+                    hideAllSAAS("page-landing");
+                    break;
                 case 'download':
                     updateDownload(json['progress'])
                     break;
