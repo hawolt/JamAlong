@@ -20,6 +20,9 @@ public abstract class AbstractAudioSource implements AudioSource {
     public Audio pop() {
         Audio audio = list.isEmpty() ? null : list.remove(0);
         if (audio != null) Logger.debug("popping: {}", audio.name());
+        if (list.size() <= 1 && getCurrentlyLoadingReferences() == 0) {
+            loadNextPendingReference();
+        }
         return audio;
     }
 
