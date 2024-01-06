@@ -14,6 +14,7 @@ import com.hawolt.http.Request;
 import com.hawolt.http.misc.DownloadCallback;
 import com.hawolt.logger.Logger;
 import com.hawolt.misc.HostType;
+import com.hawolt.misc.Network;
 import com.hawolt.remote.RemoteClient;
 import com.hawolt.settings.SettingManager;
 import com.hawolt.media.Audio;
@@ -80,10 +81,12 @@ public class LocalExecutor implements DownloadCallback {
             path("/api", () -> {
                 get("/load", new ContextBiConsumer<>(application, LOAD));
                 get("/host", new ContextBiConsumer<>(application, HOST));
+                get("/reveal", new ContextBiConsumer<>(application, REVEAL));
                 get("/discover", new ContextBiConsumer<>(application, DISCOVER));
                 get("/join/{partyId}", new ContextBiConsumer<>(application, JOIN));
                 get("/namechange/{name}/{partyId}", new ContextBiConsumer<>(application, NAMECHANGE));
                 get("/visibility/{partyId}/{status}", new ContextBiConsumer<>(application, VISIBILITY));
+                get("/gatekeeper/{partyId}/{status}", new ContextBiConsumer<>(application, GATEKEEPER));
             });
         });
     }
@@ -165,6 +168,16 @@ public class LocalExecutor implements DownloadCallback {
         return object;
     }
 
+    private BiConsumer<Context, Application> REVEAL = (context, application) -> {
+        Audio current = application.getAudioManager().getCurrent();
+        if (current == null) return;
+        try {
+            Network.browse(current.source());
+        } catch (IOException e) {
+            Logger.error(e);
+        }
+    };
+
     private BiConsumer<Context, Application> JOIN = (context, application) -> {
         RemoteClient remoteClient = application.getRemoteClient();
         AudioManager audioManager = application.getAudioManager();
@@ -197,6 +210,10 @@ public class LocalExecutor implements DownloadCallback {
     };
     private BiConsumer<Context, Application> VISIBILITY = (context, application) -> {
         JSONObject object = application.getRemoteClient().executeBlocking("visibility", context.pathParam("partyId"), context.pathParam("status"));
+        context.result(object.toString());
+    };
+    private BiConsumer<Context, Application> GATEKEEPER = (context, application) -> {
+        JSONObject object = application.getRemoteClient().executeBlocking("gatekeeper", context.pathParam("partyId"), context.pathParam("status"));
         context.result(object.toString());
     };
 
