@@ -255,6 +255,15 @@ public class LocalExecutor implements DownloadCallback {
             if (assets.length() > 0) {
                 JSONObject asset = assets.getJSONObject(0);
                 if (asset.has("browser_download_url")) {
+                    try {
+                        if (application.getServerSocket() != null) {
+                            application.setGracefulShutdown(true);
+                            application.getServerSocket().close();
+                            application.nullifyServerSocket();
+                        }
+                    } catch (IOException e) {
+                        Logger.error(e);
+                    }
                     invokeSelfUpdate(asset.getString("browser_download_url"));
                 }
             }

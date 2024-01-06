@@ -9,7 +9,7 @@ window.onload = function () {
         .then((response) => response.text())
         .then((data) => {
             if (data === "false") return;
-            //hideAllSAAS("page-updater");
+            hideAllSAAS("page-updater");
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -288,7 +288,7 @@ function connect(host) {
                     }
                     break;
                 case 'reveal':
-                    document.getElementById('trackname').innerHTML=json['name'];
+                    document.getElementById('trackname').innerHTML = json['name'];
                     break;
                 case 'close':
                     hideAllSAAS("page-landing");

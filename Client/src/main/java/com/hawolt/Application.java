@@ -9,6 +9,7 @@ import com.hawolt.misc.Debouncer;
 import com.hawolt.remote.RemoteClient;
 import com.hawolt.settings.SettingManager;
 
+import java.net.ServerSocket;
 import java.util.Optional;
 
 /**
@@ -23,7 +24,9 @@ public class Application {
     private RemoteClient remoteClient;
     private SocketServer socketServer;
     private AudioManager audioManager;
+    private ServerSocket serverSocket;
     private int websocketPort;
+    private boolean graceful;
     private String version;
 
     public void setVersion(String version) {
@@ -100,5 +103,26 @@ public class Application {
 
     public int getWebSocketPort() {
         return websocketPort;
+    }
+
+    public void setServerSocket(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
+    }
+
+    public ServerSocket getServerSocket() {
+        return serverSocket;
+    }
+
+    public void setGracefulShutdown(boolean b) {
+        this.graceful = b;
+    }
+
+    public boolean isGraceful() {
+        return graceful;
+    }
+
+    public void nullifyServerSocket() {
+        if (serverSocket == null) return;
+        this.serverSocket = null;
     }
 }

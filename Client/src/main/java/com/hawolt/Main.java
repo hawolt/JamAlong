@@ -73,6 +73,7 @@ public class Main {
             SocketServer socketServer = SocketServer.launch(websocketPort);
             application.setSocketServer(socketServer);
             // initialize UI
+            if (Main.failed) Thread.sleep(3000L);
             Jamalong.create(webserverPort, useOSR);
             // initialize RPC
             Optional<RichPresence> richPresence = RichPresence.create(application);
@@ -80,7 +81,9 @@ public class Main {
             application.getRichPresence().ifPresent(presence -> {
                 application.getRemoteClient().addInstructionListener(presence);
             });
-        } catch (IOException | AudioMixerUnavailableException e) {
+            application.setGracefulShutdown(true);
+            application.getServerSocket().close();
+        } catch (IOException | AudioMixerUnavailableException | InterruptedException e) {
             Logger.error(e);
             System.err.println("Unable to launch Jamalong, exiting (1).");
             System.exit(1);
@@ -131,7 +134,7 @@ public class Main {
 
     private static void bootstrap(Application application, List<String> arguments, boolean useOSR, boolean allowMultipleClients) {
         if (!allowMultipleClients) {
-            singletonInstance();
+            singletonInstance(application);
         }
         try {
             JsonSource source = JsonSource.of(Core.read(RunLevel.get(StaticConstant.PROJECT_DATA)).toString());
@@ -164,21 +167,31 @@ public class Main {
         }
     }
 
-    private static void singletonInstance() {
-        try {
-            ServerSocket socket = new ServerSocket(StaticConstant.SELF_PORT);
-            ExecutorService service = ExecutorManager.getService("pool");
-            service.execute(() -> {
-                do {
-                    try {
-                        socket.accept();
-                    } catch (IOException e) {
-                        Logger.error(e);
-                    }
-                } while (!Thread.currentThread().isInterrupted());
-            });
-        } catch (IOException e) {
-            System.exit(1);
-        }
+    private static boolean failed;
+
+    private static void singletonInstance(Application application) {
+        ExecutorService service = ExecutorManager.getService("pool");
+        service.execute(() -> {
+            int attempts = 0;
+            do {
+                Logger.debug("attempt {}", attempts);
+                if (application.isGraceful()) break;
+                try {
+                    ServerSocket socket = new ServerSocket(StaticConstant.SELF_PORT);
+                    application.setServerSocket(socket);
+                    socket.accept();
+                } catch (IOException e) {
+                    if (!application.isGraceful()) Logger.error(e);
+                }
+                Main.failed = true;
+                try {
+                    Thread.sleep(1000L);
+                } catch (InterruptedException e) {
+                    Logger.error(e);
+                }
+            } while (++attempts < 3);
+            Logger.debug("Port closed");
+            if (!application.isGraceful()) System.exit(1);
+        });
     }
 }
