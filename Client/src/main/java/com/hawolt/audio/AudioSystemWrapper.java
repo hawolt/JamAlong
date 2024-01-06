@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Utility class to manage System audio devices and audio playback behaviour.
  */
-public class SystemAudio {
+public class AudioSystemWrapper {
     private static final Line.Info PLAYBACK_DEVICE = new Line.Info(SourceDataLine.class);
     private static final AudioFormat BASE_AUDIO_FORMAT = new AudioFormat(
             AudioFormat.Encoding.PCM_SIGNED,
@@ -27,7 +27,7 @@ public class SystemAudio {
     public SourceDataLine sourceDataLine;
     public AudioFormat audioFormat;
 
-    public SystemAudio() throws AudioMixerUnavailableException {
+    public AudioSystemWrapper() throws AudioMixerUnavailableException {
         for (Mixer.Info mixerInfo : AudioSystem.getMixerInfo()) {
             Mixer mixer = AudioSystem.getMixer(mixerInfo);
             if (mixer.isLineSupported(PLAYBACK_DEVICE) && mixer.isLineSupported(BASE_DATA_LINE)) {

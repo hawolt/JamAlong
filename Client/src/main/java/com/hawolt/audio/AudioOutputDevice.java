@@ -3,6 +3,11 @@ package com.hawolt.audio;
 import javax.sound.sampled.Mixer;
 import java.util.Objects;
 
+/**
+ * Wrapper class to see the actual Name of the audio output device.
+ *
+ * @param mixer the Mixer representing an audio output device
+ */
 public record AudioOutputDevice(Mixer mixer) {
 
     @Override
