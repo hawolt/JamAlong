@@ -1,5 +1,8 @@
-package com.hawolt;
+package com.hawolt.misc;
 
+/**
+ * Provides access to a powerful JVM based dynamic casting solution
+ */
 public class Unsafe {
     /**
      * Used to convert any Object reference to the required type.
