@@ -18,8 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * An examples showing how to automatically download, extract and load
- * Discord's native library.
+ *
  */
 
 public class DiscordLibraryManager {

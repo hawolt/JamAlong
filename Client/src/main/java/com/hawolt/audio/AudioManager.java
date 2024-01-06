@@ -1,8 +1,9 @@
 package com.hawolt;
 
 import com.hawolt.audio.SystemAudio;
-import com.hawolt.chromium.LocalExecutor;
+import com.hawolt.localhost.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
+import com.hawolt.exceptions.AudioMixerUnavailableException;
 import com.hawolt.logger.Logger;
 import com.hawolt.source.Audio;
 import com.hawolt.source.AudioSource;
@@ -10,10 +11,7 @@ import com.hawolt.source.StreamUpdateListener;
 import com.hawolt.source.impl.AbstractAudioSource;
 import org.json.JSONObject;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
@@ -24,18 +22,22 @@ public class PlaybackHandler implements Runnable, InstructionListener {
     private final ExecutorService service = Executors.newSingleThreadExecutor();
     private final List<StreamUpdateListener> list = new LinkedList<>();
     private final List<String> skip = new ArrayList<>();
+
     private final AbstractAudioSource source;
     private final RemoteClient remoteClient;
+    private final SystemAudio audio;
     private long timestamp;
     private Audio current;
+    private long reset;
 
-    private PlaybackHandler(RemoteClient remoteClient, AbstractAudioSource source) {
+    private PlaybackHandler(RemoteClient remoteClient, AbstractAudioSource source) throws AudioMixerUnavailableException {
         this.source = source;
+        this.audio = new SystemAudio();
         this.remoteClient = remoteClient;
         this.remoteClient.addInstructionListener(this);
     }
 
-    public static PlaybackHandler start(RemoteClient remoteClient, AbstractAudioSource source) {
+    public static PlaybackHandler start(RemoteClient remoteClient, AbstractAudioSource source) throws AudioMixerUnavailableException {
         PlaybackHandler playbackHandler = new PlaybackHandler(remoteClient, source);
         playbackHandler.service.execute(playbackHandler);
         return playbackHandler;
@@ -56,7 +58,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
 
     public void reset() {
         this.source.clear();
-        SystemAudio.closeSourceDataLine();
+        this.audio.closeSourceDataLine();
     }
 
     @Override
@@ -75,8 +77,8 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(current.data());
 
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
-                SystemAudio.setAudioInputStream(audioInputStream);
-                SystemAudio.openSourceDataLine(audioInputStream.getFormat());
+                this.audio.setAudioInputStream(audioInputStream);
+                this.audio.openSourceDataLine(audioInputStream.getFormat());
 
                 byte[] buffer = new byte[4096];
                 int read;
@@ -89,7 +91,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                 }
                 Main.presence.ifPresent(presence -> presence.set(LocalExecutor.PARTY_ID));
                 checkSkipList();
-                while (SystemAudio.sourceDataLine.isOpen() && (read = audioInputStream.read(buffer, 0, buffer.length)) != -1) {
+                while (this.audio.sourceDataLine.isOpen() && (read = audioInputStream.read(buffer, 0, buffer.length)) != -1) {
                     checkSkipList();
                     int offset = getAudioPointerOffset(current.data());
                     if (offset != 0) {
@@ -97,12 +99,12 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                         audioInputStream.skip(offset);
                         continue;
                     }
-                    SystemAudio.sourceDataLine.write(buffer, 0, read);
+                    this.audio.sourceDataLine.write(buffer, 0, read);
                 }
                 Logger.debug("stopped playing {}", current.name());
-                SystemAudio.closeSourceDataLine();
+                this.audio.closeSourceDataLine();
                 audioInputStream.close();
-            } catch (InterruptedException | UnsupportedAudioFileException | IOException e) {
+            } catch (InterruptedException | UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 Logger.error(e);
                 try {
                     Thread.sleep(1000L);
@@ -117,7 +119,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
         if (!skip.contains(current.source())) return;
         Logger.debug("[player] skip {}", current.source());
         skip.remove(current.source());
-        SystemAudio.closeSourceDataLine();
+        this.audio.closeSourceDataLine();
     }
 
     public int getAudioPointerOffset(byte[] b) {
@@ -141,7 +143,7 @@ public class PlaybackHandler implements Runnable, InstructionListener {
             boolean success = object.getString("result").equals(LocalExecutor.PARTY_ID);
             Logger.debug("skip:{}", success);
         }, LocalExecutor.PARTY_ID, current.source());
-        SystemAudio.closeSourceDataLine();
+        this.audio.closeSourceDataLine();
     }
 
     public AudioSource getAudioSource() {
@@ -165,18 +167,22 @@ public class PlaybackHandler implements Runnable, InstructionListener {
                 break;
             case "close":
                 SocketServer.forward(object.toString());
-                SystemAudio.closeSourceDataLine();
+                this.audio.closeSourceDataLine();
                 break;
             case "seek":
                 this.timestamp = object.getLong("timestamp");
                 break;
             case "revalidate":
-                SystemAudio.closeSourceDataLine();
+                this.audio.closeSourceDataLine();
                 source.load(object.getString("url"));
                 break;
             case "preload":
                 source.preload(object.getString("url"));
                 break;
         }
+    }
+
+    public SystemAudio getSystemAudio() {
+        return audio;
     }
 }

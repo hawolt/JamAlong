@@ -113,7 +113,6 @@ public class RemoteClient extends WebSocketClient {
             }, 5, 5, TimeUnit.SECONDS);
         }
     }
-
     @Override
     public void onError(Exception e) {
         Logger.error(e.getMessage());

@@ -3,13 +3,10 @@ package com.hawolt.chromium;
 import com.hawolt.*;
 import com.hawolt.audio.SystemAudio;
 import com.hawolt.common.Pair;
-import com.hawolt.discord.RichPresence;
 import com.hawolt.http.BasicHttp;
 import com.hawolt.http.Request;
-import com.hawolt.http.Response;
 import com.hawolt.http.misc.DownloadCallback;
 import com.hawolt.logger.Logger;
-import com.hawolt.misc.Debouncer;
 import com.hawolt.settings.SettingManager;
 import com.hawolt.source.Audio;
 import com.hawolt.source.AudioSource;
@@ -21,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -33,7 +29,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -49,8 +44,6 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 public class LocalExecutor {
     public static HostType HOST_TYPE = HostType.UNKNOWN;
     public static String PARTY_ID;
-
-    public static long RESET_TIMESTAMP;
 
     public static void configure(SettingManager manager, int websocketPort, PlaybackHandler playbackHandler, AbstractAudioSource source, RemoteClient remoteClient) {
         path("/v1", () -> {
@@ -160,10 +153,10 @@ public class LocalExecutor {
         context.result(object.toString());
     };
     private static BiConsumer<Context, Pair<RemoteClient, PlaybackHandler>> RESET = (context, pair) -> {
-        LocalExecutor.RESET_TIMESTAMP = System.currentTimeMillis();
+        PlaybackHandler playbackHandler = pair.getV();
+        playbackHandler.getAudioSource().setPartyLeaveTimestamp(System.currentTimeMillis());
         RemoteClient remoteClient = pair.getK();
         JSONObject object = remoteClient.executeBlocking("leave", LocalExecutor.PARTY_ID == null ? "nil" : LocalExecutor.PARTY_ID);
-        PlaybackHandler playbackHandler = pair.getV();
         playbackHandler.reset();
         context.result(object.toString());
     };

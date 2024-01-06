@@ -3,9 +3,12 @@ package com.hawolt.source;
 import java.util.Optional;
 
 public interface AudioSource {
+
     Audio await(long interval) throws InterruptedException;
 
     Audio peek(long interval) throws InterruptedException;
+
+    void setPartyLeaveTimestamp(long timestamp);
 
     void preload(String path);
 
