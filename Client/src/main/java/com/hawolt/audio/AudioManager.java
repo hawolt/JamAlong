@@ -188,6 +188,14 @@ public class AudioManager implements Runnable, InstructionListener {
         SocketServer socketServer = application.getSocketServer();
         String instruction = object.getString("instruction");
         switch (instruction) {
+            case "chat":
+                socketServer.forward(object.toString());
+                break;
+            case "rediscover":
+                if (application.getLocalExecutor().getHostType() == HostType.UNKNOWN) {
+                    socketServer.forward(object.toString());
+                }
+                break;
             case "gatekeeper":
                 socketServer.forward(object.toString());
                 this.gatekeeper = object.getBoolean("status");

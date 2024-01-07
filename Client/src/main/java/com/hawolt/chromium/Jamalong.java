@@ -55,7 +55,7 @@ public class Jamalong {
             frame.setUndecorated(true);
             container.removeAll();
             container.setBackground(new Color(224, 224, 224));
-            container.setPreferredSize(new Dimension(550, 340));
+            container.setPreferredSize(new Dimension(550, 400));
             JComponent component = (JComponent) container;
             component.setBackground(new Color(76, 74, 72));
             component.setBorder(new EmptyBorder(1, 1, 1, 1));

@@ -14,13 +14,55 @@
     <div id="jamalong" class="centered">
         <div id="titlebar">
             <i id="mainpage" class="settings fa-solid fa-house home"></i>
-            <i id="settings" class="settings fa-solid fa-gear gear"></i>
+            <div class="percent-70">
+                <div class="noselect scroll-left">
+                    <p id="nowplaying"></p>
+                </div>
+            </div>
+            <div class="noselect flex gap">
+                <div class="titlebar-fix">
+                    <div id="secondary" class="titlebar-fix">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div id="reveal" class="settings hidden titlebar-fix">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                </div>
+                <i class="option settings fa-solid fa-gear gear" id="settings"></i>
+                <i class="settings home fa-solid fa-circle-chevron-left disabled" id="return"></i>
+            </div>
         </div>
 
-        <div id="page-center">
+        <div id="page-center" class="hide-overflow">
+            <div id="page-chat" class="saas block hidden">
+                <div class="chat-spacer">
+                    <div class="flex bar noselect">
+                        <div class="flex gap">
+                            <div><i class="fa-solid fa-user fa-2xl" aria-hidden="true"></i></div>
+                            <div class="hoster">hawolt 👑</div>
+                        </div>
+                        <div class="flex gap">
+                            <div class="total">1</div>
+                            <div><i class="fa-solid fa-ghost fa-2xl" aria-hidden="true"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex chat-spacer">
+                    <div class="chat-container">
+                        <div id="msg-container" class="messagebox chat-pad">
+                            
+                        </div>
+                        <div class="flex gap submit m-t-a">
+                            <input class="sender shrink no-radius" type="text" placeholder="message, hit enter to send" size="16"/>
+                        </div>
+                    </div>
+                    <div class="noselect userlist-pad userlist block">
+                    </div>
+                </div>
+            </div>
 
-            <div id="page-blank" class="saas hidden">
-                <i class="fa-solid fa-music fa-2xl"></i>
+            <div id="page-nowplaying" class="saas hidden">
+                
             </div>
 
             <div id="page-updater" class="saas block gap hidden">
@@ -44,57 +86,45 @@
             <div id="page-join" class="saas block hidden">
                 <div class="flex gap add-margin">
                     <input class="center expand" type="text" id="partyid" placeholder="party id" size="32"/>
-                    <div class="center main-button fix" id="join">Join</div>
+                    <div class="center sharp-button fix" id="join">Join</div>
                 </div>
                 <div class="block" id="roomlist">
                 </div>
             </div>
 
-            <div id="page-attendee" class="saas block">
-                <div class="flex bar">
-                    <div class="flex gap">
-                        <div><i class="fa-solid fa-user fa-2xl"></i></div>
-                        <div class="host"></div>
-                    </div>
-                    <div class="flex gap">
-                        <div class="total"></div>
-                        <div><i class="fa-solid fa-ghost fa-2xl"></i></div>
-                    </div>
-                </div>
-                <div class="userlist noselect center"></div>
-                <div class="flex bar">
-                    <div id="trackname" class="track"></div>
-                    <div id="secondary">
-                        <i class="fa-solid fa-lock fa-2xl"></i>
-                    </div>
-                    <div id="reveal" class="settings hidden">
-                        <i class="fa-solid fa-music fa-2xl"></i>
-                    </div>
-                </div>
-            </div>
-
             <div id="page-host" class="saas block hidden">
-                <div class="flex gap add-margin height-25">
-                    <div id="party" class="expand align-left"></div>
-                    <div class="main-button shrink-font" id="copy">copy</div>
-                </div>
                 <div class="flex gap add-margin">
                     <input class="shrink" type="text" id="sclink"
                            placeholder="search query or soundcloud link, to load hit enter (input will vanish)"
                            size="16"/>
-                    <div class="main-button shrink-font" id="skip">skip</div>
-                </div>
-                <div class="flex bar">
-                    <div class="flex gap">
-                        <div><i class="fa-solid fa-user fa-2xl"></i></div>
-                        <div class="host"></div>
-                    </div>
-                    <div class="flex gap">
-                        <div class="total"></div>
-                        <div><i class="fa-solid fa-ghost fa-2xl"></i></div>
+                    <div class="auto">
+                        <i class="home settings fa-solid fa-forward fa-2xl" id="skip"></i>
                     </div>
                 </div>
-                <div class="userlist noselect center"></div>
+                <div class="chat-spacer">
+                    <div class="flex bar noselect">
+                        <div class="flex gap">
+                            <div><i class="fa-solid fa-user fa-2xl" aria-hidden="true"></i></div>
+                            <div class="hoster">hawolt 👑</div>
+                        </div>
+                        <div class="flex gap">
+                            <div class="total">1</div>
+                            <div><i class="fa-solid fa-ghost fa-2xl" aria-hidden="true"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex chat-spacer">
+                    <div class="chat-container">
+                        <div id="msg-container" class="messagebox chat-pad">
+                            
+                        </div>
+                        <div class="flex gap submit m-t-a">
+                            <input class="sender shrink no-radius" type="text" placeholder="message, hit enter to send" size="16"/>
+                        </div>
+                    </div>
+                    <div class="noselect userlist-pad userlist block">
+                    </div>
+                </div>
             </div>
 
             <div id="page-settings" class="saas block gap hidden">
@@ -103,6 +133,10 @@
                     <div class="main-button shrink-font" id="set-name">set</div>
                 </div>
                 <div id="visibility" class="block bar hidden">
+                    <div class="flex bar">
+                        <div id="party" class="expand align-left"></div>
+                        <i id="copy" class="home settings fa-solid fa-copy"></i>
+                    </div>
                     <div class="flex bar">
                         <div>Private Party</div>
                         <input type="checkbox" id="partyVisibility">

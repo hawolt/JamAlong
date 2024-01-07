@@ -9,7 +9,7 @@ window.onload = function () {
         .then((response) => response.text())
         .then((data) => {
             if (data === "false") return;
-            hideAllSAAS("page-updater");
+            //hideAllSAAS("page-updater");
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -18,6 +18,18 @@ window.onload = function () {
     document.getElementById("decline-update").addEventListener("click", function () {
         hideAllSAAS("page-landing");
     });
+
+    let senders = document.getElementsByClassName('sender');
+    for (let i = 0; i < senders.length; i++) {
+        let sender = senders[i];
+        sender.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                message(sender.value);
+                sender.value = "";
+            }
+        });
+    }
 
     document.getElementById("accept-update").addEventListener("click", function () {
         call(origin + 'v1/config/invoke');
@@ -60,20 +72,38 @@ window.onload = function () {
 
 
     const visibility = document.getElementById('visibility');
-    const settings = document.getElementById("settings");
-    settings.addEventListener("click", function () {
-        if (settings.classList.contains("fa-gear")) {
-            settings.dataset.previous = getActiveSAAS();
-            hideAllSAAS("page-settings");
-            if (document.getElementById('jamalong').dataset.status === "host") {
-                if (visibility.classList.contains("hidden")) visibility.classList.remove("hidden");
-            } else {
-                if (!visibility.classList.contains("hidden")) visibility.classList.add("hidden");
+
+    var options = document.getElementsByClassName("option");
+    for (let i = 0; i < options.length; i++) {
+        options[i].addEventListener("click", e => {
+            if(!e.target.classList.contains('disabled')) {
+                let active = getActiveSAAS();
+                if(!active.includes("settings")){
+                    settings.dataset.previous = active;
+                }
+                document.getElementById("return").classList.remove("disabled");
+                for (let i = 0; i < options.length; i++) {
+                    options[i].classList.add("disabled");
+                }
+                if(e.target.id=='settings'){
+                    if (document.getElementById('jamalong').dataset.status === "host") {
+                        if (visibility.classList.contains("hidden")) visibility.classList.remove("hidden");
+                    } else {
+                        if (!visibility.classList.contains("hidden")) visibility.classList.add("hidden");
+                    }
+                }
+                hideAllSAAS("page-"+e.target.id);
             }
-            settings.classList = "settings fa-solid fa-backward back";
-        } else {
+        });
+    }
+
+    document.getElementById("return").addEventListener("click", e => {
+        if(!e.target.classList.contains('disabled')) {
             hideAllSAAS(settings.dataset.previous);
-            settings.classList = "settings fa-solid fa-gear gear";
+            document.getElementById("return").classList.add("disabled");
+            for (let i = 0; i < options.length; i++) {
+                options[i].classList.remove("disabled");
+            }
         }
     });
 
@@ -139,9 +169,17 @@ window.onload = function () {
 
 function openLandingPage() {
     configure("idle");
-    const settings = document.getElementById("settings");
-    settings.dataset.previous = "page-landing";
-    settings.classList = "settings fa-solid fa-gear gear";
+    var options = document.getElementsByClassName("option");
+    for (let i = 0; i < options.length; i++) {
+        document.getElementById("return").classList.add("disabled");
+        for (let i = 0; i < options.length; i++) {
+            options[i].classList.remove("disabled");
+        }
+    }
+    let boxes = document.getElementsByClassName('messagebox');
+    for (let i = 0; i < boxes.length; i++) {
+        boxes[i].innerHTML="";
+    }
     hideAllSAAS("page-landing");
 }
 
@@ -246,7 +284,7 @@ function join(partyId) {
         .then((data) => {
             let args = data['result'].split(' ');
             if (args[0] === partyId) {
-                hideAllSAAS("page-attendee");
+                hideAllSAAS("page-chat");
             }
         })
         .catch((error) => {
@@ -256,6 +294,10 @@ function join(partyId) {
 
 function reveal() {
     call(origin + 'v1/api/reveal');
+}
+
+function message(msg) {
+    call(origin + 'v1/api/chat/'+ btoa(msg));
 }
 
 function load(link) {
@@ -270,6 +312,17 @@ function toggleTrackVisibility(partyId, status) {
     call(origin + 'v1/api/gatekeeper/' + partyId + '/' + status);
 }
 
+function gatekeep(status){
+    let reveal = document.getElementById("reveal");
+    let secondary = document.getElementById("secondary");
+    if (status) {
+        reveal.classList.add('hidden');
+        secondary.classList.remove('hidden');
+    } else {
+        reveal.classList.remove('hidden');
+        secondary.classList.add('hidden');
+    }
+}
 
 function connect(host) {
     let socket = new WebSocket(host);
@@ -278,24 +331,35 @@ function connect(host) {
         hideAllSAAS("page-landing");
     };
     socket.onmessage = function (msg) {
+        console.log(msg.data);
         const json = JSON.parse(msg.data);
+        console.log(json);
         if (json.hasOwnProperty('instruction')) {
-            console.log(json);
             switch (json['instruction']) {
-                case 'gatekeeper':
-                    let status = json['status'];
-                    let reveal = document.getElementById("reveal");
-                    let secondary = document.getElementById("secondary");
-                    if (status) {
-                        reveal.classList.add('hidden');
-                        secondary.classList.remove('hidden');
-                    } else {
-                        reveal.classList.remove('hidden');
-                        secondary.classList.add('hidden');
+                case 'chat':
+                    let boxes = document.getElementsByClassName('messagebox');
+                    for (let i = 0; i < boxes.length; i++) {
+                        let box = boxes[i];
+                        console.log(i+" "+box)
+                        let message = json['user']+":<br>"+json['message'];
+                        let div = document.createElement('div');
+                        div.title = json['identifier'];
+                        div.innerHTML = message;
+                        box.appendChild(div);
+                        box.scrollTo(0, box.scrollHeight);
                     }
                     break;
+                case 'rediscover':
+                    discover();
+                    break;
+                case 'reset-gatekeeper':
+                    gatekeep(true);
+                    break;
+                case 'gatekeeper':
+                    gatekeep(json['status']);
+                    break;
                 case 'reveal':
-                    document.getElementById('trackname').innerHTML = json['name'];
+                    document.getElementById('nowplaying').innerHTML = json['name'];
                     break;
                 case 'close':
                     hideAllSAAS("page-landing");
@@ -308,19 +372,22 @@ function connect(host) {
                     break;
                 case 'list':
                     var users = json['users'];
-                    var hosts = document.getElementsByClassName('host');
+                    var hosts = document.getElementsByClassName('hoster');
                     for (let i = 0; i < hosts.length; i++) {
                         hosts[i].innerHTML = users[0];
                     }
-                    var string = "";
-                    for (let i = 1; i < users.length; i++) {
-                        if (i != 1) string += ", ";
-                        string += users[i];
-                    }
+
                     var userlists = document.getElementsByClassName('userlist');
                     for (let i = 0; i < userlists.length; i++) {
-                        userlists[i].innerHTML = string;
+                        let userlist = userlists[i];
+                        userlist.innerHTML = "";
+                        for (let i = 1; i < users.length; i++) {
+                            let div = document.createElement('div');
+                            div.innerHTML=users[i];
+                            userlist.appendChild(div);
+                        }
                     }
+                    
                     var totals = document.getElementsByClassName('total');
                     for (let i = 0; i < totals.length; i++) {
                         totals[i].innerHTML = users.length;
@@ -329,7 +396,7 @@ function connect(host) {
             }
         } else if (json.hasOwnProperty('result')) {
             document.getElementById("partyid").value = json["result"].split(" ")[0];
-            hideAllSAAS("page-attendee");
+            hideAllSAAS("page-chat");
         }
     };
     socket.onclose = function (msg) {

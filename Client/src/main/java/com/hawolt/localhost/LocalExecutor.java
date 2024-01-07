@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,9 +75,7 @@ public class LocalExecutor implements DownloadCallback {
                 get("/invoke", new ContextBiConsumer<>(application, SELF_UPDATE));
                 get("/version", new ContextBiConsumer<>(application, UPDATE_CHECK));
                 get("/websocket", context -> context.result(String.valueOf(application.getWebSocketPort())));
-                get("/gain", context -> context.result(
-                        String.valueOf(application.getSettingManager().getClientSettings().getClientVolumeGain()))
-                );
+                get("/gain", context -> context.result(String.valueOf(application.getSettingManager().getClientSettings().getClientVolumeGain())));
             });
             path("/api", () -> {
                 get("/load", new ContextBiConsumer<>(application, LOAD));
@@ -84,6 +83,7 @@ public class LocalExecutor implements DownloadCallback {
                 get("/reveal", new ContextBiConsumer<>(application, REVEAL));
                 get("/discover", new ContextBiConsumer<>(application, DISCOVER));
                 get("/join/{partyId}", new ContextBiConsumer<>(application, JOIN));
+                get("/chat/{message}", new ContextBiConsumer<>(application, MESSAGE));
                 get("/namechange/{name}/{partyId}", new ContextBiConsumer<>(application, NAMECHANGE));
                 get("/visibility/{partyId}/{status}", new ContextBiConsumer<>(application, VISIBILITY));
                 get("/gatekeeper/{partyId}/{status}", new ContextBiConsumer<>(application, GATEKEEPER));
@@ -185,17 +185,30 @@ public class LocalExecutor implements DownloadCallback {
         String partyId = context.pathParam("partyId");
         context.result(join(remoteClient, audioManager, partyId).toString());
     };
+    private BiConsumer<Context, Application> MESSAGE = (context, application) -> {
+        RemoteClient remoteClient = application.getRemoteClient();
+        String message = context.pathParam("message");
+        JSONObject response = remoteClient.executeBlocking(
+                "chat",
+                partyId,
+                message
+        );
+        Logger.debug(response);
+    };
 
     private BiConsumer<Context, Application> NAMECHANGE = (context, application) -> {
         RemoteClient remoteClient = application.getRemoteClient();
         SettingManager manager = application.getSettingManager();
         String name = context.pathParam("name");
         JSONObject object = remoteClient.executeBlocking("name", context.pathParam("partyId"), name);
-        if (object.getString("result").equals(name)) {
-            manager.write("name", new String(Base64.getDecoder().decode(name)));
+        String plaintext = new String(Base64.getDecoder().decode(context.pathParam("name").getBytes(StandardCharsets.UTF_8)));
+        String result = object.getString("result").replace(" \uD83D\uDC51", "");
+        if (result.equals(plaintext)) {
+            manager.write("name", plaintext);
         }
         context.result(object.toString());
     };
+
     private BiConsumer<Context, Application> DISCOVER = (context, application) -> {
         application.getRichPresence().ifPresent(RichPresence::setIdlePresence);
         JSONObject object = application.getRemoteClient().executeBlocking("discover");
@@ -289,11 +302,7 @@ public class LocalExecutor implements DownloadCallback {
             } catch (Exception e) {
                 // ignored
             }
-            ProcessBuilder builder = new ProcessBuilder(
-                    "java",
-                    "-jar",
-                    path.toString()
-            );
+            ProcessBuilder builder = new ProcessBuilder("java", "-jar", path.toString());
             builder.start();
             Logger.debug("[updater] restarting for new version");
             System.exit(1);
@@ -304,13 +313,7 @@ public class LocalExecutor implements DownloadCallback {
 
     private void write(Path path, byte[] b) throws IOException {
         Logger.debug("[updater] writing: {}", path);
-        Files.write(
-                path,
-                b,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.WRITE,
-                StandardOpenOption.TRUNCATE_EXISTING
-        );
+        Files.write(path, b, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     private byte[] read(HttpURLConnection connection, DownloadCallback callback) throws IOException {

@@ -9,6 +9,18 @@ html, body {
     margin: 0px;
 }
 
+.sharp-button {
+    background: #79B4A9;
+    border: 1px solid #37323E;
+    font-size: 30px;
+    padding: 5px 10px 5px 10px;
+}
+
+.sharp-button:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
 .main-button {
     background: #79B4A9;
     border: 1px solid #37323E;
@@ -163,8 +175,144 @@ html, body {
     cursor: pointer;
 }
 
+#nowplaying {
+    font-style: italic;
+    font-size: 20px;
+}
+
+.percent-70 {
+    width: 70%
+}
+
+.chat-container {
+    border-left: 1px solid #FCF7FF;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.m-t-a {
+    margin-top: auto;
+}
+
+.messagebox {
+    text-align: left;
+    overflow: hidden;
+    word-wrap: break-word;
+    overflow-y: scroll;
+    height: 95px;
+    max-height: 95px;
+}
+
+.userlist {
+    border-left: 1px solid #FCF7FF;
+    text-align: left;
+    width: 380px;
+    height: 120px;
+    max-height: 120px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.titlebar-fix {
+    margin: auto;
+    display: flex;
+}
+
+.userlist-pad{
+    padding: 5px;
+}
+
+.chat-pad{
+    padding-left:5px;
+}
+
+.chat {
+    border-left: 1px solid #FCF7FF;
+    width: 100%;
+    height: 190px;
+    text-align: left;
+    max-height: 190px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    
+}
+
+.hide-overflow {
+    overflow-y: hidden;
+}
+
+.chat-spacer {
+    border-bottom: 1px solid #FCF7FF;
+}
+
+.chat-sidebar {
+    min-width: 250px;
+    width: 250px;
+}
+
+.auto {
+    margin: auto;
+}
+
+.auto-top-bottom {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.sidebar-element {
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+}
+
+.left {
+    margin-left: 0px;
+}
+
+#copy {
+    margin: 3px;
+}
+
+.scroll-left {
+ margin: 5px;
+ height: 50px;	
+ overflow: hidden;
+ position: relative;
+ white-space: nowrap;
+}
+.scroll-left p {
+ position: absolute;
+ width: 100%;
+ height: 100%;
+ margin: 0;
+ line-height: 50px;
+ text-align: center;
+ transform:translateX(100%);
+ animation: scroll-left 15s linear infinite;
+}
+
+@keyframes scroll-left {
+ 0% {
+ transform: translateX(100%);
+ }
+ 100% {
+ transform: translateX(-200%); 
+ }
+}
+
 .hidden {
     display: none;
+}
+
+.disabled {
+    color: gray;
+}
+
+.disabled:hover {
+    cursor: not-allowed;
+    transform: none;
 }
 
 input[type=text], select {
@@ -175,6 +323,10 @@ input[type=text], select {
     border: 1px solid #ccc;
     border-radius: 10px;
     box-sizing: border-box;
+}
+
+.radius {
+    border-radius: 10px;
 }
 
 .noselect {
@@ -199,3 +351,7 @@ input[type=text], select {
     background-color: #FCF7FF;
 }
   
+
+input[type=text] {
+    border-radius: 0px;
+}
