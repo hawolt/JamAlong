@@ -236,7 +236,8 @@ function host() {
 }
 
 function username(name, partyId) {
-    call(origin + 'v1/api/namechange/' + name + '/' + partyId);
+    let party = partyId.length === 0 ? 'nil' : partyId;
+    call(origin + 'v1/api/namechange/' + btoa(name) + '/' + party);
 }
 
 function join(partyId) {
