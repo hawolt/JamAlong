@@ -192,7 +192,7 @@ public class LocalExecutor implements DownloadCallback {
         String name = context.pathParam("name");
         JSONObject object = remoteClient.executeBlocking("name", context.pathParam("partyId"), name);
         if (object.getString("result").equals(name)) {
-            manager.write("name", name);
+            manager.write("name", new String(Base64.getDecoder().decode(name)));
         }
         context.result(object.toString());
     };
