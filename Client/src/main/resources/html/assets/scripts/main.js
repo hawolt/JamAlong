@@ -282,9 +282,15 @@ function connect(host) {
             console.log(json);
             switch (json['instruction']) {
                 case 'gatekeeper':
-                    var gatekeepers = document.getElementsByClassName('gatekeeper');
-                    for (let i = 0; i < gatekeepers.length; i++) {
-                        gatekeepers[i].classList.toggle('hidden');
+                    let status = json['status'];
+                    let reveal = document.getElementById("reveal");
+                    let secondary = document.getElementById("secondary");
+                    if (status) {
+                        reveal.classList.add('hidden');
+                        secondary.classList.remove('hidden');
+                    } else {
+                        reveal.classList.remove('hidden');
+                        secondary.classList.add('hidden');
                     }
                     break;
                 case 'reveal':

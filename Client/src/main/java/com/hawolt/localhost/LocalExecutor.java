@@ -150,6 +150,7 @@ public class LocalExecutor implements DownloadCallback {
 
     public JSONObject join(RemoteClient remoteClient, AudioManager audioManager, String partyId) {
         this.hostType = HostType.ATTENDEE;
+        this.application.getAudioManager().setGatekeeper(true);
         JSONObject object = remoteClient.executeBlocking("join", partyId);
         String[] arguments = object.getString("result").split(" ");
         if (arguments.length > 0) {

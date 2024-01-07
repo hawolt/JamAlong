@@ -222,6 +222,10 @@ public class AudioManager implements Runnable, InstructionListener {
         }
     }
 
+    public void setGatekeeper(boolean gatekeeper) {
+        this.gatekeeper = gatekeeper;
+    }
+
     public AudioSystemWrapper getSystemAudio() {
         return audio;
     }

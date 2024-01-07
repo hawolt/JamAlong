@@ -2,15 +2,18 @@ package com.hawolt.chromium;
 
 import com.hawolt.io.RunLevel;
 import com.hawolt.logger.Logger;
+import io.javalin.http.Handler;
 import me.friwi.jcefmaven.CefInitializationException;
 import me.friwi.jcefmaven.UnsupportedPlatformException;
 import org.cef.CefApp;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,12 +22,14 @@ import java.nio.file.Paths;
  * Graphical main component for JamAlong.
  */
 public class Jamalong {
+    private static final Color base = new Color(76, 74, 72);
+    private static Point initialClick;
+
     public static JFrame frame;
 
     public static void create(int port, boolean useOSR) throws IOException {
         JFrame frame = new JFrame();
-        String icon = "html/assets/Jamalong.png";
-        frame.setIconImage(ImageIO.read(RunLevel.get(icon)));
+        frame.setIconImage(ImageIO.read(RunLevel.get("html/assets/Jamalong.png")));
         frame.setTitle("JamAlong");
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -39,7 +44,6 @@ public class Jamalong {
         container.setLayout(new BorderLayout());
         VisualProgressHandler handler = new VisualProgressHandler();
         container.add(handler, BorderLayout.CENTER);
-        frame.setResizable(false);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -48,9 +52,18 @@ public class Jamalong {
             Logger.debug("{}", "http://127.0.0.1:" + port);
             Chromium chromium = new Chromium("http://127.0.0.1:" + port, path, useOSR, handler);
             frame.dispose();
+            frame.setUndecorated(true);
             container.removeAll();
             container.setBackground(new Color(224, 224, 224));
-            container.setPreferredSize(new Dimension(550, 310));
+            container.setPreferredSize(new Dimension(550, 340));
+            JComponent component = (JComponent) container;
+            component.setBackground(new Color(76, 74, 72));
+            component.setBorder(new EmptyBorder(1, 1, 1, 1));
+            JPanel move = getHeader(frame);
+            addWindowStyle(move, ImageIO.read(RunLevel.get("html/assets/Jamalong26.png")));
+            addWindowInteraction(move);
+            move.setBackground(base);
+            container.add(move, BorderLayout.NORTH);
             container.add(chromium.getBrowserUI(), BorderLayout.CENTER);
             frame.pack();
             frame.setLocationRelativeTo(null);
@@ -59,5 +72,50 @@ public class Jamalong {
             Logger.error(e);
         }
         Jamalong.frame = frame;
+    }
+
+    private static void addWindowStyle(JPanel move, BufferedImage image) {
+        LogoComponent logo = new LogoComponent(image);
+        move.add(logo, BorderLayout.WEST);
+    }
+
+    private static void addWindowInteraction(JPanel move) {
+        JPanel main = new JPanel(new GridLayout(0, 2));
+        JamalongButton button1 = new JamalongButton(base, new Color(87, 85, 83));
+        button1.addActionListener(listener -> Jamalong.frame.setState(JFrame.ICONIFIED));
+        button1.setText("—");
+        main.add(button1);
+        JamalongButton button2 = new JamalongButton(base, new Color(196, 43, 28));
+        button2.addActionListener(listener -> System.exit(1));
+        button2.setText("✖");
+        main.add(button2);
+        move.add(main, BorderLayout.EAST);
+    }
+
+    @NotNull
+    private static JPanel getHeader(Frame source) {
+        JPanel move = new JPanel();
+        move.setLayout(new BorderLayout());
+        move.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                Jamalong.initialClick = e.getPoint();
+            }
+        });
+        move.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(final MouseEvent e) {
+                final int thisX = source.getLocation().x;
+                final int thisY = source.getLocation().y;
+                final int xMoved = e.getX() - Jamalong.initialClick.x;
+                final int yMoved = e.getY() - Jamalong.initialClick.y;
+                final int X = thisX + xMoved;
+                final int Y = thisY + yMoved;
+                source.setLocation(X, Y);
+            }
+        });
+        move.setBackground(new Color(224, 224, 224));
+        move.setPreferredSize(new Dimension(0, 34));
+        return move;
     }
 }
