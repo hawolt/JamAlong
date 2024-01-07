@@ -76,7 +76,14 @@ public class Jamalong {
 
     private static void addWindowStyle(JPanel move, BufferedImage image) {
         LogoComponent logo = new LogoComponent(image);
-        move.add(logo, BorderLayout.WEST);
+        JPanel style = new JPanel(new BorderLayout(5, 0));
+        style.setBackground(new Color(76, 74, 72));
+        style.add(logo, BorderLayout.WEST);
+        JLabel label = new JLabel("JamAlong");
+        label.setFont(new Font("Dialog", Font.BOLD, 18));
+        label.setForeground(new Color(252, 247, 255));
+        style.add(label, BorderLayout.CENTER);
+        move.add(style, BorderLayout.WEST);
     }
 
     private static void addWindowInteraction(JPanel move) {
