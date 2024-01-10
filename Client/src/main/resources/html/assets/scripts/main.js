@@ -36,6 +36,10 @@ window.onload = function () {
         hideAllSAAS("page-update");
     });
 
+    document.getElementById("discord").addEventListener("click", function () {
+        openURL('https://discord.hawolt.com');
+    });
+
     document.getElementById("reveal").addEventListener("click", function () {
         reveal();
     });
@@ -181,6 +185,15 @@ function openLandingPage() {
         boxes[i].innerHTML = "";
     }
     hideAllSAAS("page-landing");
+    fetch(origin + 'v1/config/version')
+    .then((response) => response.text())
+    .then((data) => {
+        if (data === "false") return;
+        hideAllSAAS("page-updater");
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 function configure(current) {
@@ -292,6 +305,10 @@ function join(partyId) {
         });
 }
 
+function openURL(link){
+    call(origin + 'v1/config/open/' + btoa(link));
+}
+
 function reveal() {
     call(origin + 'v1/api/reveal');
 }
@@ -369,7 +386,7 @@ function connect(host) {
                     document.getElementById('nowplaying').innerHTML = json['name'];
                     break;
                 case 'close':
-                    hideAllSAAS("page-landing");
+                    openLandingPage();
                     break;
                 case 'download':
                     updateDownload(json['progress'])

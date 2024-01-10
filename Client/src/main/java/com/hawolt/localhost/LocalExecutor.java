@@ -71,6 +71,7 @@ public class LocalExecutor implements DownloadCallback {
             path("/config", () -> {
                 get("/reset", new ContextBiConsumer<>(application, RESET));
                 get("/skip", context -> application.getAudioManager().skip());
+                get("/open/{url}", new ContextBiConsumer<>(application, OPEN));
                 get("/gain/{value}", new ContextBiConsumer<>(application, GAIN));
                 get("/invoke", new ContextBiConsumer<>(application, SELF_UPDATE));
                 get("/version", new ContextBiConsumer<>(application, UPDATE_CHECK));
@@ -90,6 +91,17 @@ public class LocalExecutor implements DownloadCallback {
             });
         });
     }
+
+    private BiConsumer<Context, Application> OPEN = (context, application) -> {
+        String url = context.pathParam("url");
+        String plain = new String(Base64.getDecoder().decode(url.getBytes()));
+        if (!plain.startsWith("https")) return;
+        try {
+            Network.browse(plain);
+        } catch (IOException e) {
+            Logger.error(e);
+        }
+    };
 
     private BiConsumer<Context, Application> LOAD = (context, application) -> {
         String url = context.queryParam("url");

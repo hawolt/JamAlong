@@ -70,6 +70,15 @@ html, body {
     transform: scale(1.1);
 }
 
+#discord{
+    transition: transform 0.5s ease-in-out;
+}
+
+#discord:hover {
+    cursor: pointer;
+    transform: scale(1.1) rotate(360deg);
+}
+
 .gear:hover {
     transform: scale(1.1) rotate(90deg);
 }
