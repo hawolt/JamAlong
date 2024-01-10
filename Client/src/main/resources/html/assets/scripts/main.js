@@ -9,7 +9,7 @@ window.onload = function () {
         .then((response) => response.text())
         .then((data) => {
             if (data === "false") return;
-            //hideAllSAAS("page-updater");
+            hideAllSAAS("page-updater");
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -76,29 +76,29 @@ window.onload = function () {
     var options = document.getElementsByClassName("option");
     for (let i = 0; i < options.length; i++) {
         options[i].addEventListener("click", e => {
-            if(!e.target.classList.contains('disabled')) {
+            if (!e.target.classList.contains('disabled')) {
                 let active = getActiveSAAS();
-                if(!active.includes("settings")){
+                if (!active.includes("settings")) {
                     settings.dataset.previous = active;
                 }
                 document.getElementById("return").classList.remove("disabled");
                 for (let i = 0; i < options.length; i++) {
                     options[i].classList.add("disabled");
                 }
-                if(e.target.id=='settings'){
+                if (e.target.id == 'settings') {
                     if (document.getElementById('jamalong').dataset.status === "host") {
                         if (visibility.classList.contains("hidden")) visibility.classList.remove("hidden");
                     } else {
                         if (!visibility.classList.contains("hidden")) visibility.classList.add("hidden");
                     }
                 }
-                hideAllSAAS("page-"+e.target.id);
+                hideAllSAAS("page-" + e.target.id);
             }
         });
     }
 
     document.getElementById("return").addEventListener("click", e => {
-        if(!e.target.classList.contains('disabled')) {
+        if (!e.target.classList.contains('disabled')) {
             hideAllSAAS(settings.dataset.previous);
             document.getElementById("return").classList.add("disabled");
             for (let i = 0; i < options.length; i++) {
@@ -178,7 +178,7 @@ function openLandingPage() {
     }
     let boxes = document.getElementsByClassName('messagebox');
     for (let i = 0; i < boxes.length; i++) {
-        boxes[i].innerHTML="";
+        boxes[i].innerHTML = "";
     }
     hideAllSAAS("page-landing");
 }
@@ -297,7 +297,7 @@ function reveal() {
 }
 
 function message(msg) {
-    call(origin + 'v1/api/chat/'+ btoa(msg));
+    call(origin + 'v1/api/chat/' + btoa(msg));
 }
 
 function load(link) {
@@ -312,7 +312,7 @@ function toggleTrackVisibility(partyId, status) {
     call(origin + 'v1/api/gatekeeper/' + partyId + '/' + status);
 }
 
-function gatekeep(status){
+function gatekeep(status) {
     let reveal = document.getElementById("reveal");
     let secondary = document.getElementById("secondary");
     if (status) {
@@ -340,11 +340,18 @@ function connect(host) {
                     let boxes = document.getElementsByClassName('messagebox');
                     for (let i = 0; i < boxes.length; i++) {
                         let box = boxes[i];
-                        console.log(i+" "+box)
-                        let message = json['user']+":<br>"+json['message'];
                         let div = document.createElement('div');
-                        div.title = json['identifier'];
-                        div.innerHTML = message;
+                        let span = document.createElement('span');
+                        span.classList="msg-user";
+                        span.innerHTML=json['user'];
+                        span.title=json['identifier'];
+                        div.appendChild(span);
+                        let msg = document.createElement('span');
+                        msg.innerHTML=": "+json['message'];
+                        const currentDate = new Date();
+                        const formattedTimestamp = currentDate.toLocaleString();
+                        msg.title=formattedTimestamp;
+                        div.appendChild(msg);
                         box.appendChild(div);
                         box.scrollTo(0, box.scrollHeight);
                     }
@@ -383,11 +390,11 @@ function connect(host) {
                         userlist.innerHTML = "";
                         for (let i = 1; i < users.length; i++) {
                             let div = document.createElement('div');
-                            div.innerHTML=users[i];
+                            div.innerHTML = users[i];
                             userlist.appendChild(div);
                         }
                     }
-                    
+
                     var totals = document.getElementsByClassName('total');
                     for (let i = 0; i < totals.length; i++) {
                         totals[i].innerHTML = users.length;

@@ -31,7 +31,7 @@ public class SettingManager implements SettingService {
 
     @Override
     public void write(String name, Object o) {
-        Logger.debug("[settings] write '{}' as '{}'", name, o == null ? "null" : o);
+        Logger.info("[settings] write '{}' as '{}'", name, o == null ? "null" : o);
         client.put(name, o);
         write();
         this.dispatch(name, o);

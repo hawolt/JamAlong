@@ -71,7 +71,7 @@ public class RichPresence implements Runnable, InstructionListener {
                 params.registerEventHandler(new DiscordEventHandler() {
                     @Override
                     public void onActivityJoin(String secret) {
-                        Logger.debug("onActivityJoin:{}", secret);
+                        Logger.info("onActivityJoin:{}", secret);
                         if (core == null) return;
                         set(secret);
                         JSONObject kill = new JSONObject();

@@ -2,6 +2,7 @@ package com.hawolt;
 
 import com.hawolt.audio.AudioManager;
 import com.hawolt.chromium.Jamalong;
+import com.hawolt.cryptography.AES256;
 import com.hawolt.localhost.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
 import com.hawolt.discord.RichPresence;
@@ -21,13 +22,17 @@ import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.ServerSocket;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -188,7 +193,7 @@ public class Main {
                     Logger.error(e);
                 }
             } while (++attempts < 3);
-            Logger.debug("Port closed");
+            Logger.info("SingletonInstance down");
             if (!application.isGraceful()) System.exit(1);
         });
     }

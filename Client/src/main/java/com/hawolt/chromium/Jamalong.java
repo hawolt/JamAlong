@@ -23,8 +23,9 @@ import java.nio.file.Paths;
  */
 public class Jamalong {
     private static final Color base = new Color(76, 74, 72);
+    private static Rectangle previous;
+    private static boolean toggle;
     private static Point initialClick;
-
     public static JFrame frame;
 
     public static void create(int port, boolean useOSR) throws IOException {
@@ -44,6 +45,9 @@ public class Jamalong {
         container.setLayout(new BorderLayout());
         VisualProgressHandler handler = new VisualProgressHandler();
         container.add(handler, BorderLayout.CENTER);
+        ComponentResizer resizer = new ComponentResizer();
+        resizer.registerComponent(frame);
+        resizer.setSnapSize(new Dimension(10, 10));
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -58,7 +62,7 @@ public class Jamalong {
             container.setPreferredSize(new Dimension(550, 400));
             JComponent component = (JComponent) container;
             component.setBackground(new Color(76, 74, 72));
-            component.setBorder(new EmptyBorder(1, 1, 1, 1));
+            component.setBorder(new EmptyBorder(0, 5, 5, 5));
             JPanel move = getHeader(frame);
             addWindowStyle(move, ImageIO.read(RunLevel.get("html/assets/Jamalong26.png")));
             addWindowInteraction(move);
@@ -74,6 +78,23 @@ public class Jamalong {
         Jamalong.frame = frame;
     }
 
+    public static final ActionListener MAXIMIZE = action -> {
+        Jamalong.toggle = !Jamalong.toggle;
+        if (Jamalong.toggle) {
+            Jamalong.previous = Jamalong.frame.getBounds();
+            Point location = Jamalong.frame.getLocation();
+            GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+            for (int i = 0; i < devices.length; i++) {
+                GraphicsDevice device = devices[i];
+                Rectangle screen = device.getDefaultConfiguration().getBounds();
+                if (!screen.contains(location)) continue;
+                Jamalong.frame.setBounds(screen);
+            }
+        } else {
+            Jamalong.frame.setBounds(Jamalong.previous);
+        }
+    };
+
     private static void addWindowStyle(JPanel move, BufferedImage image) {
         LogoComponent logo = new LogoComponent(image);
         JPanel style = new JPanel(new BorderLayout(5, 0));
@@ -87,15 +108,19 @@ public class Jamalong {
     }
 
     private static void addWindowInteraction(JPanel move) {
-        JPanel main = new JPanel(new GridLayout(0, 2));
+        JPanel main = new JPanel(new GridLayout(0, 3));
         JamalongButton button1 = new JamalongButton(base, new Color(87, 85, 83));
         button1.addActionListener(listener -> Jamalong.frame.setState(JFrame.ICONIFIED));
         button1.setText("—");
         main.add(button1);
-        JamalongButton button2 = new JamalongButton(base, new Color(196, 43, 28));
-        button2.addActionListener(listener -> System.exit(1));
-        button2.setText("✖");
+        JamalongButton button2 = new JamalongButton(base, new Color(87, 85, 83));
+        button2.addActionListener(MAXIMIZE);
+        button2.setText("\uD83D\uDDD6");
         main.add(button2);
+        JamalongButton button3 = new JamalongButton(base, new Color(196, 43, 28));
+        button3.addActionListener(listener -> System.exit(1));
+        button3.setText("✖");
+        main.add(button3);
         move.add(main, BorderLayout.EAST);
     }
 

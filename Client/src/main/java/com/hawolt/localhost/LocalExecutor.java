@@ -193,7 +193,6 @@ public class LocalExecutor implements DownloadCallback {
                 partyId,
                 message
         );
-        Logger.debug(response);
     };
 
     private BiConsumer<Context, Application> NAMECHANGE = (context, application) -> {
@@ -294,7 +293,7 @@ public class LocalExecutor implements DownloadCallback {
             String name = url.substring(url.lastIndexOf("/") + 1);
             String filename = String.join(".", StaticConstant.PROJECT, "jar");
             Path path = StaticConstant.APPLICATION_CACHE.resolve(filename);
-            Logger.debug("[updater] invoke download: {}", url);
+            Logger.info("[updater] invoke download: {}", url);
             byte[] b = read(connection, this);
             write(path, b);
             try {
@@ -304,7 +303,7 @@ public class LocalExecutor implements DownloadCallback {
             }
             ProcessBuilder builder = new ProcessBuilder("java", "-jar", path.toString());
             builder.start();
-            Logger.debug("[updater] restarting for new version");
+            Logger.info("[updater] restarting for new version");
             System.exit(1);
         } catch (Exception e) {
             Logger.error(e);

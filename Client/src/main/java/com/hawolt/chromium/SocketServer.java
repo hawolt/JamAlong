@@ -50,7 +50,7 @@ public class SocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        Logger.debug("Chromium connected to local WebSocket server");
+        Logger.info("Chromium connected to local WebSocket server");
         if (this.connected = true) {
             for (String message : queue) {
                 forward(message);
@@ -60,7 +60,7 @@ public class SocketServer extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        Logger.debug("Chromium disconnected from local WebSocket server");
+        Logger.info("Chromium disconnected from local WebSocket server");
     }
 
     @Override
@@ -75,6 +75,6 @@ public class SocketServer extends WebSocketServer {
 
     @Override
     public void onStart() {
-        Logger.debug("Started WebSocket server");
+        Logger.info("Started WebSocket server");
     }
 }

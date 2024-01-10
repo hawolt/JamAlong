@@ -1,5 +1,6 @@
 package com.hawolt.media.impl;
 
+import com.hawolt.cryptography.SHA256;
 import com.hawolt.logger.Logger;
 import com.hawolt.media.Audio;
 import com.hawolt.media.AudioSource;
@@ -12,14 +13,14 @@ public abstract class AbstractAudioSource implements AudioSource {
 
     @Override
     public void push(Audio audio) {
-        Logger.debug("pushing: {}", audio.name());
+        Logger.info("PUSH AUDIO: {}", SHA256.hash(audio.name()));
         list.add(audio);
     }
 
     @Override
     public Audio pop() {
         Audio audio = list.isEmpty() ? null : list.remove(0);
-        if (audio != null) Logger.debug("popping: {}", audio.name());
+        if (audio != null) Logger.info("POP AUDIO: {}", SHA256.hash(audio.name()));
         if (list.size() <= 4 && getCurrentlyLoadingReferences() == 0) {
             loadNextPendingReference();
         }

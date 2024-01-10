@@ -2,6 +2,7 @@ package com.hawolt.audio;
 
 import com.hawolt.Application;
 import com.hawolt.Main;
+import com.hawolt.cryptography.SHA256;
 import com.hawolt.discord.RichPresence;
 import com.hawolt.localhost.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
@@ -79,7 +80,7 @@ public class AudioManager implements Runnable, InstructionListener {
                     listener.onAudioUpdate(current, timestamp);
                     next.ifPresent(listener::onAudioPeekUpdate);
                 }
-                Logger.debug("[audio-player] now playing: {}", current.name());
+                Logger.info("[audio-player] now playing: {}", SHA256.hash(current.name()));
                 if (!gatekeeper) revealCurrentlyPlayingSong();
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(current.data());
 
@@ -111,7 +112,7 @@ public class AudioManager implements Runnable, InstructionListener {
                     }
                     this.audio.sourceDataLine.write(buffer, 0, read);
                 }
-                Logger.debug("stopped playing {}", current.name());
+                Logger.info("stopped playing {}", SHA256.hash(current.name()));
                 this.audio.closeSourceDataLine();
                 audioInputStream.close();
             } catch (InterruptedException | UnsupportedAudioFileException | IOException | LineUnavailableException e) {
@@ -141,7 +142,7 @@ public class AudioManager implements Runnable, InstructionListener {
 
     private void checkSkipList() {
         if (!skip.contains(current.source())) return;
-        Logger.debug("[player] skip {}", current.source());
+        Logger.info("[player] skip {}", SHA256.hash(current.name()));
         skip.remove(current.source());
         this.audio.closeSourceDataLine();
     }
