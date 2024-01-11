@@ -6,6 +6,7 @@ import com.hawolt.localhost.LocalExecutor;
 import com.hawolt.chromium.SocketServer;
 import com.hawolt.cryptography.SHA256;
 import com.hawolt.logger.Logger;
+import com.hawolt.media.Audio;
 import com.hawolt.misc.ExecutorManager;
 import com.hawolt.misc.HostType;
 import com.hawolt.os.OperatingSystem;
@@ -47,9 +48,11 @@ public class RichPresence implements Runnable, InstructionListener {
     private final AudioManager audioManager;
     private final RemoteClient remoteClient;
     private final SocketServer socketServer;
+    private final Application application;
     private Core core;
 
     private RichPresence(Application application) {
+        this.application = application;
         this.audioManager = application.getAudioManager();
         this.remoteClient = application.getRemoteClient();
         this.socketServer = application.getSocketServer();
@@ -139,8 +142,10 @@ public class RichPresence implements Runnable, InstructionListener {
             activity.setType(ActivityType.LISTENING);
             String state = localExecutor.getHostType() == HostType.HOST ? "Hosting" :
                     localExecutor.getHostType() == HostType.ATTENDEE ? "Listening" : "Idle";
+            Audio current = application.getAudioManager().getCurrent();
+            if (current != null && !audioManager.isGatekeeper()) state = current.name();
             activity.setDetails(state);
-            String details = partySize > 1 ? "Jamming" :
+            String details = partySize > 1 ? "In a Party" :
                     !"Idle".equals(state) ? "Alone" : "Not Listening";
             activity.setState(details);
             if (secret != null) {

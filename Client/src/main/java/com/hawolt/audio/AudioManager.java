@@ -88,7 +88,7 @@ public class AudioManager implements Runnable, InstructionListener {
                 this.audio.setAudioInputStream(audioInputStream);
                 this.audio.openSourceDataLine(audioInputStream.getFormat());
 
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[256];
                 int read;
 
                 LocalExecutor localExecutor = application.getLocalExecutor();
@@ -189,7 +189,7 @@ public class AudioManager implements Runnable, InstructionListener {
         SocketServer socketServer = application.getSocketServer();
         String instruction = object.getString("instruction");
         switch (instruction) {
-            case "chat":
+            case "chat", "list":
                 socketServer.forward(object.toString());
                 break;
             case "rediscover":
@@ -202,6 +202,9 @@ public class AudioManager implements Runnable, InstructionListener {
                 this.gatekeeper = object.getBoolean("status");
                 if (!gatekeeper && current != null) revealCurrentlyPlayingSong();
                 else hideCurrentlyPlayingSong();
+                Optional<RichPresence> richPresence = application.getRichPresence();
+                String partyId = application.getLocalExecutor().getPartyId();
+                richPresence.ifPresent(presence -> presence.set(partyId));
                 break;
             case "reset-gatekeeper":
                 this.gatekeeper = true;
@@ -209,9 +212,6 @@ public class AudioManager implements Runnable, InstructionListener {
             case "skip":
                 String toSkip = object.getString("track");
                 this.skip.add(toSkip);
-                break;
-            case "list":
-                socketServer.forward(object.toString());
                 break;
             case "close":
                 this.source.clear();
@@ -237,5 +237,9 @@ public class AudioManager implements Runnable, InstructionListener {
 
     public AudioSystemWrapper getSystemAudio() {
         return audio;
+    }
+
+    public boolean isGatekeeper() {
+        return gatekeeper;
     }
 }
