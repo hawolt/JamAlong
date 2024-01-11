@@ -172,6 +172,7 @@ window.onload = function () {
 }
 
 function openLandingPage() {
+    gatekeep(true);
     configure("idle");
     var options = document.getElementsByClassName("option");
     for (let i = 0; i < options.length; i++) {
@@ -180,20 +181,21 @@ function openLandingPage() {
             options[i].classList.remove("disabled");
         }
     }
+    document.getElementById('nowplaying').innerHTML = "";
     let boxes = document.getElementsByClassName('messagebox');
     for (let i = 0; i < boxes.length; i++) {
         boxes[i].innerHTML = "";
     }
     hideAllSAAS("page-landing");
     fetch(origin + 'v1/config/version')
-    .then((response) => response.text())
-    .then((data) => {
-        if (data === "false") return;
-        hideAllSAAS("page-updater");
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        .then((response) => response.text())
+        .then((data) => {
+            if (data === "false") return;
+            hideAllSAAS("page-updater");
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 }
 
 function configure(current) {
@@ -305,7 +307,7 @@ function join(partyId) {
         });
 }
 
-function openURL(link){
+function openURL(link) {
     call(origin + 'v1/config/open/' + btoa(link));
 }
 
@@ -359,15 +361,15 @@ function connect(host) {
                         let box = boxes[i];
                         let div = document.createElement('div');
                         let span = document.createElement('span');
-                        span.classList="msg-user";
-                        span.innerHTML=json['user'];
-                        span.title=json['identifier'];
+                        span.classList = "msg-user";
+                        span.innerHTML = json['user'];
+                        span.title = json['identifier'];
                         div.appendChild(span);
                         let msg = document.createElement('span');
-                        msg.innerHTML=": "+json['message'];
+                        msg.innerHTML = ": " + json['message'];
                         const currentDate = new Date();
                         const formattedTimestamp = currentDate.toLocaleString();
-                        msg.title=formattedTimestamp;
+                        msg.title = formattedTimestamp;
                         div.appendChild(msg);
                         box.appendChild(div);
                         box.scrollTo(0, box.scrollHeight);
