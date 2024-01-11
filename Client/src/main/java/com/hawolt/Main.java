@@ -79,7 +79,7 @@ public class Main {
             application.setSocketServer(socketServer);
             // initialize UI
             if (Main.failed) Thread.sleep(3000L);
-            Jamalong.create(webserverPort, useOSR);
+            Jamalong.create(application, webserverPort, useOSR);
             // initialize RPC
             Optional<RichPresence> richPresence = RichPresence.create(application);
             application.setRichPresence(richPresence);

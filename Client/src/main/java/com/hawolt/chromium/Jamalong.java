@@ -1,5 +1,7 @@
 package com.hawolt.chromium;
 
+import com.hawolt.Application;
+import com.hawolt.Main;
 import com.hawolt.io.RunLevel;
 import com.hawolt.logger.Logger;
 import io.javalin.http.Handler;
@@ -28,7 +30,7 @@ public class Jamalong {
     private static Point initialClick;
     public static JFrame frame;
 
-    public static void create(int port, boolean useOSR) throws IOException {
+    public static void create(Application application, int port, boolean useOSR) throws IOException {
         JFrame frame = new JFrame();
         frame.setIconImage(ImageIO.read(RunLevel.get("html/assets/Jamalong.png")));
         frame.setTitle("JamAlong");
@@ -64,7 +66,7 @@ public class Jamalong {
             component.setBackground(new Color(76, 74, 72));
             component.setBorder(new EmptyBorder(0, 5, 5, 5));
             JPanel move = getHeader(frame);
-            addWindowStyle(move, ImageIO.read(RunLevel.get("html/assets/Jamalong26.png")));
+            addWindowStyle(application, move, ImageIO.read(RunLevel.get("html/assets/Jamalong26.png")));
             addWindowInteraction(move);
             move.setBackground(base);
             container.add(move, BorderLayout.NORTH);
@@ -95,12 +97,12 @@ public class Jamalong {
         }
     };
 
-    private static void addWindowStyle(JPanel move, BufferedImage image) {
+    private static void addWindowStyle(Application application, JPanel move, BufferedImage image) {
         LogoComponent logo = new LogoComponent(image);
         JPanel style = new JPanel(new BorderLayout(5, 0));
         style.setBackground(new Color(76, 74, 72));
         style.add(logo, BorderLayout.WEST);
-        JLabel label = new JLabel("JamAlong");
+        JLabel label = new JLabel("JamAlong v" + application.getVersion());
         label.setFont(new Font("Dialog", Font.BOLD, 18));
         label.setForeground(new Color(252, 247, 255));
         style.add(label, BorderLayout.CENTER);
