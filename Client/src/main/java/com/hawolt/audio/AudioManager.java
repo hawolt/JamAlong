@@ -202,9 +202,11 @@ public class AudioManager implements Runnable, InstructionListener {
                 this.gatekeeper = object.getBoolean("status");
                 if (!gatekeeper && current != null) revealCurrentlyPlayingSong();
                 else hideCurrentlyPlayingSong();
-                Optional<RichPresence> richPresence = application.getRichPresence();
                 String partyId = application.getLocalExecutor().getPartyId();
-                richPresence.ifPresent(presence -> presence.set(partyId));
+                Optional<RichPresence> richPresence = application.getRichPresence();
+                if (richPresence.isPresent() && partyId != null) {
+                    richPresence.ifPresent(presence -> presence.set(partyId));
+                }
                 break;
             case "reset-gatekeeper":
                 this.gatekeeper = true;
