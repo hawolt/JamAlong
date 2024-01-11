@@ -41,8 +41,8 @@ public class Chromium {
         Logger.info("Chromium base: {}", base.resolve("chrome.log"));
         Files.createDirectories(base);
         builder.getCefSettings().windowless_rendering_enabled = useOSR;
-        builder.getCefSettings().log_severity = CefSettings.LogSeverity.LOGSEVERITY_ERROR;
-        builder.getCefSettings().log_file = Paths.get(System.getProperty("user.home")).resolve(".jamalong").resolve("chrome.log").toString();
+        builder.getCefSettings().log_severity = CefSettings.LogSeverity.LOGSEVERITY_VERBOSE;
+        builder.getCefSettings().log_file = Paths.get(System.getProperty("user.home")).resolve(".hawolt").resolve(".chrome").resolve("chrome.log").toString();
         builder.addJcefArgs("--disable-gpu");
         builder.setProgressHandler(handler);
         Files.createDirectories(path);
