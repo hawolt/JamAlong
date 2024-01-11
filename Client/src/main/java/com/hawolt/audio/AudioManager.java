@@ -100,7 +100,10 @@ public class AudioManager implements Runnable, InstructionListener {
                 }
 
                 Optional<RichPresence> richPresence = application.getRichPresence();
-                richPresence.ifPresent(presence -> presence.set(localExecutor.getPartyId()));
+                String partyId = application.getLocalExecutor().getPartyId();
+                if (richPresence.isPresent() && partyId != null) {
+                    richPresence.ifPresent(presence -> presence.set(partyId));
+                }
                 checkSkipList();
                 while (this.audio.sourceDataLine.isOpen() && (read = audioInputStream.read(buffer, 0, buffer.length)) != -1) {
                     checkSkipList();
