@@ -155,6 +155,10 @@ window.onload = function () {
         copyToClipboard(document.getElementById("party").innerHTML);
     });
 
+    document.getElementById("invite").addEventListener("click", function () {
+        copyToClipboard('https://jamalong.hawolt.com/?party=' + document.getElementById("party").innerHTML);
+    });
+
     document.getElementById("select-host").addEventListener("click", function () {
         configure("host");
         host();
@@ -366,7 +370,11 @@ function connect(host) {
                         span.title = json['identifier'];
                         div.appendChild(span);
                         let msg = document.createElement('span');
-                        msg.innerHTML = ": " + json['message'];
+                        if (!json.hasOwnProperty('type')) {
+                            msg.innerHTML = ": " + json['message'];
+                        } else {
+                            msg.innerHTML = " " + json['message'];
+                        }
                         const currentDate = new Date();
                         const formattedTimestamp = currentDate.toLocaleString();
                         msg.title = formattedTimestamp;

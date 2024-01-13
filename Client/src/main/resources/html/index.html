@@ -34,9 +34,9 @@
             </div>
         </div>
 
-        <div id="page-center" class="hide-overflow">
+        <div id="page-center" class="hide-overflow host">
             <div id="page-chat" class="saas block host hidden">
-                <div class="chat-spacer">
+                <div class="">
                     <div class="flex bar noselect">
                         <div class="flex gap">
                             <div><i class="fa-solid fa-user fa-2xl" aria-hidden="true"></i></div>
@@ -48,22 +48,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex chat-spacer consume">
+                <div class="flex consume">
                     <div class="chat-container">
-                        <div id="msg-container" class="messagebox chat-pad">
-                            
+                        <div class="messagebox chat-pad">
+
                         </div>
                         <div class="flex gap submit m-t-a">
-                            <input class="sender shrink no-radius" type="text" placeholder="message, hit enter to send" size="16"/>
+                            <input class="sender shrink no-radius" type="text" placeholder="message, hit enter to send"
+                                   size="16"/>
                         </div>
-                    </div>
-                    <div class="noselect userlist-pad userlist block">
                     </div>
                 </div>
             </div>
 
             <div id="page-nowplaying" class="saas hidden">
-                
+
             </div>
 
             <div id="page-updater" class="saas block gap hidden">
@@ -93,6 +92,7 @@
                 </div>
             </div>
 
+
             <div id="page-host" class="saas block host hidden">
                 <div class="flex gap add-margin">
                     <input class="shrink" type="text" id="sclink"
@@ -102,7 +102,7 @@
                         <i class="home settings fa-solid fa-forward fa-2xl" id="skip"></i>
                     </div>
                 </div>
-                <div class="chat-spacer">
+                <div class="">
                     <div class="flex bar noselect">
                         <div class="flex gap">
                             <div><i class="fa-solid fa-user fa-2xl" aria-hidden="true"></i></div>
@@ -114,19 +114,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex chat-spacer consume">
-                    <div class="chat-container">
-                        <div id="msg-container" class="messagebox chat-pad">
-                            
-                        </div>
-                        <div class="flex gap submit m-t-a">
-                            <input class="sender shrink no-radius" type="text" placeholder="message, hit enter to send" size="16"/>
-                        </div>
-                    </div>
-                    <div class="noselect userlist-pad userlist block">
-                    </div>
+                <div class="chat-container">
+                    <div class="messagebox"></div>
+                    <input
+                            class="sender shrink no-radius"
+                            type="text"
+                            placeholder="message, hit enter to send"
+                            size="16"
+                    />
                 </div>
             </div>
+
 
             <div id="page-settings" class="saas block gap hidden">
                 <div class="flex gap shrink">
@@ -134,27 +132,41 @@
                     <div class="main-button shrink-font" id="set-name">set</div>
                 </div>
                 <div id="visibility" class="block bar hidden">
-                    <div class="flex bar">
+                    <div class="flex bar center-me">
                         <div id="party" class="expand align-left"></div>
-                        <i id="copy" class="home settings fa-solid fa-copy"></i>
+                        <i id="copy" class="home settings fa-solid fa-copy cp"></i>
                     </div>
-                    <div class="flex bar">
+                    <div class="flex bar center-me">
+                        <div class="expand align-left">Copy Invite link to Clipboard</div>
+                        <i id="invite" class="home settings fa-solid fa-copy cp"></i>
+                    </div>
+                    <div class="flex bar center-me">
                         <div>Private Party</div>
                         <input type="checkbox" id="partyVisibility">
                     </div>
-                    <div class="flex bar">
+                    <div class="flex bar center-me">
                         <div>Show playing Tracks public</div>
                         <input type="checkbox" id="trackVisibility">
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="volume flex gap add-margin">
             <div class="center">Volume</div>
-            <input type="range" min="-80" max="0" value="-40" id="audio-gain" class="expand height40">
+            <input
+                    type="range"
+                    min="-80"
+                    max="0"
+                    value="-40"
+                    id="audio-gain"
+                    class="expand height40"
+            />
         </div>
     </div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </body>
 </html>
