@@ -25,6 +25,7 @@ window.onload = function () {
         sender.addEventListener("keyup", function (event) {
             event.preventDefault();
             if (event.keyCode === 13) {
+                console.log(sender.value);
                 message(sender.value);
                 sender.value = "";
             }
@@ -320,7 +321,7 @@ function reveal() {
 }
 
 function message(msg) {
-    call(origin + 'v1/api/chat/' + btoa(msg));
+    call(origin + 'v1/api/chat/' + btoa(encodeURIComponent(msg)));
 }
 
 function load(link) {
