@@ -19,4 +19,5 @@ jpackage `
 --main-class 'com.hawolt.Main' `
 --win-shortcut `
 --win-dir-chooser `
+--resource-dir 'wix' `
 --icon 'Executable\src\main\resources\Jamalong.ico'
