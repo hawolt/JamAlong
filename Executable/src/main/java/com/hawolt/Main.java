@@ -25,7 +25,8 @@ public class Main {
             ProcessBuilder builder = new ProcessBuilder(
                     java,
                     "-jar",
-                    path.toString()
+                    path.toString(),
+                    args.length > 0 ? args[0] : ""
             );
             builder.start();
         } catch (IOException e) {
