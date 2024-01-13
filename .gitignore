@@ -3,6 +3,7 @@ release/*
 jre/*
 .idea/*
 External/src/*
+Radio/src/*
 **/target
 
 ### IntelliJ BASIC ###
