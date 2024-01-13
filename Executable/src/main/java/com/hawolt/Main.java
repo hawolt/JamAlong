@@ -16,7 +16,7 @@ import java.nio.file.StandardOpenOption;
 
 public class Main {
     public static final Path APPLICATION_CACHE = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jamalong");
-    private static final String PROJECT_RELEASES = "https://api.github.com/repos/hawolt/jamalong/releases?per_page=2";
+    private static final String PROJECT_RELEASES = "https://api.github.com/repos/hawolt/jamalong/releases/latest";
     public static final String PROJECT = "JamAlong";
 
     public static void main(String[] args) {
