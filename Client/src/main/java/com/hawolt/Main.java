@@ -21,6 +21,7 @@ import com.hawolt.media.impl.SoundcloudAudioSource;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -38,12 +39,25 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
+    private static final String URI_PREFIX = "jamalong://";
+
     public static void main(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            Logger.debug("{}: {}", i, args[i]);
+        }
         // initialize Application
         List<String> arguments = Arrays.asList(args);
         boolean useOSR = arguments.contains("--osr");
         boolean allowMultipleClients = arguments.contains("--allow-multiple-clients");
         ExecutorManager.registerService("pool", Executors.newCachedThreadPool());
+        String partyId = null;
+        for (int i = 0; i < args.length; i++) {
+            if (!args[i].startsWith(URI_PREFIX)) continue;
+            partyId = args[i].substring(URI_PREFIX.length());
+            if (!partyId.endsWith("/")) break;
+            partyId = partyId.substring(0, partyId.length() - 1);
+            break;
+        }
         Application application = new Application();
         Main.bootstrap(application, arguments, useOSR, allowMultipleClients);
         try {
@@ -86,6 +100,11 @@ public class Main {
             application.getRichPresence().ifPresent(presence -> {
                 application.getRemoteClient().addInstructionListener(presence);
             });
+            // initialize JOIN
+            if (partyId == null) return;
+            JSONObject join = localExecutor.join(remoteClient, audioManager, partyId);
+            socketServer.forward(join.toString());
+            Logger.debug("[boot-join] {}", join);
         } catch (IOException | AudioMixerUnavailableException | InterruptedException e) {
             Logger.error(e);
             System.err.println("Unable to launch Jamalong, exiting (1).");
