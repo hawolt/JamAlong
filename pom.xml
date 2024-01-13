@@ -9,11 +9,8 @@
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>External</module>
         <module>Client</module>
         <module>Executable</module>
-        <module>Shared</module>
-        <module>Radio</module>
     </modules>
 
     <properties>

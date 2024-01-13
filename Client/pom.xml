@@ -44,12 +44,6 @@
             <artifactId>soundcloud-downloader</artifactId>
             <version>29dfd38564</version>
         </dependency>
-        <dependency>
-            <groupId>com.hawolt</groupId>
-            <artifactId>Shared</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>

@@ -1,4 +1,4 @@
-package com.hawolt;
+package com.hawolt.misc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

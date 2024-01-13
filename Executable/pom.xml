@@ -19,12 +19,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.hawolt</groupId>
-            <artifactId>Shared</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.hawolt.hawolt-core</groupId>
             <artifactId>HTTP</artifactId>
             <version>394df4402c</version>

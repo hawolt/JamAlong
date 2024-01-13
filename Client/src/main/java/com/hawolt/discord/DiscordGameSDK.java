@@ -1,6 +1,6 @@
 package com.hawolt.discord;
 
-import com.hawolt.StaticConstant;
+import com.hawolt.misc.StaticConstant;
 import com.hawolt.io.Core;
 import com.hawolt.os.OperatingSystem;
 

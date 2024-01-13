@@ -1,7 +1,6 @@
 package com.hawolt.settings;
 
-import com.hawolt.Main;
-import com.hawolt.StaticConstant;
+import com.hawolt.misc.StaticConstant;
 import com.hawolt.misc.ExecutorManager;
 import com.hawolt.misc.Unsafe;
 import com.hawolt.logger.Logger;

@@ -15,9 +15,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 public class Main {
+    public static final Path APPLICATION_CACHE = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jamalong");
+    private static final String PROJECT_RELEASES = "https://api.github.com/repos/hawolt/jamalong/releases?per_page=2";
+    public static final String PROJECT = "JamAlong";
+
     public static void main(String[] args) {
-        String filename = String.join(".", StaticConstant.PROJECT, "jar");
-        Path path = StaticConstant.APPLICATION_CACHE.resolve(filename);
+        String filename = String.join(".", PROJECT, "jar");
+        Path path = APPLICATION_CACHE.resolve(filename);
         Logger.debug("[updater] {}", path);
         try {
             if (!path.toFile().exists()) downloadLatestRelease(path);
@@ -37,7 +41,7 @@ public class Main {
     }
 
     private static void downloadLatestRelease(Path target) throws IOException {
-        Request request = new Request(StaticConstant.PROJECT_RELEASES);
+        Request request = new Request(PROJECT_RELEASES);
         JSONObject release = new JSONObject(request.execute().getBodyAsString());
         if (release.has("assets")) {
             JSONArray assets = release.getJSONArray("assets");
