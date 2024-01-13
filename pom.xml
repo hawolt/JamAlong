@@ -13,6 +13,7 @@
         <module>Client</module>
         <module>Executable</module>
         <module>Shared</module>
+        <module>Radio</module>
     </modules>
 
     <properties>
