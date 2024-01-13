@@ -24,7 +24,7 @@ import java.nio.file.Paths;
  * Graphical main component for JamAlong.
  */
 public class Jamalong {
-    private static final Color base = new Color(76, 74, 72);
+    private static final Color base = new Color(13, 13, 13);
     private static Rectangle previous;
     private static boolean toggle;
     private static Point initialClick;
@@ -61,9 +61,9 @@ public class Jamalong {
             frame.setUndecorated(true);
             container.removeAll();
             container.setBackground(new Color(224, 224, 224));
-            container.setPreferredSize(new Dimension(550, 400));
+            container.setPreferredSize(new Dimension(550, 550));
             JComponent component = (JComponent) container;
-            component.setBackground(new Color(76, 74, 72));
+            component.setBackground(base);
             component.setBorder(new EmptyBorder(0, 5, 5, 5));
             JPanel move = getHeader(frame);
             addWindowStyle(application, move, ImageIO.read(RunLevel.get("html/assets/Jamalong26.png")));
@@ -100,11 +100,11 @@ public class Jamalong {
     private static void addWindowStyle(Application application, JPanel move, BufferedImage image) {
         LogoComponent logo = new LogoComponent(image);
         JPanel style = new JPanel(new BorderLayout(5, 0));
-        style.setBackground(new Color(76, 74, 72));
+        style.setBackground(base);
         style.add(logo, BorderLayout.WEST);
-        JLabel label = new JLabel("JamAlong v" + application.getVersion());
+        SmoothLabel label = new SmoothLabel("JamAlong " + application.getVersion());
         label.setFont(new Font("Dialog", Font.BOLD, 18));
-        label.setForeground(new Color(252, 247, 255));
+        label.setForeground(new Color(180, 180, 180));
         style.add(label, BorderLayout.CENTER);
         move.add(style, BorderLayout.WEST);
     }

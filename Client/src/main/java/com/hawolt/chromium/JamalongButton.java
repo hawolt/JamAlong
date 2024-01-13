@@ -9,6 +9,7 @@ public class JamalongButton extends JButton {
 
     public JamalongButton(Color base, Color hover) {
         this.setPreferredSize(new Dimension(45, 28));
+        this.setForeground(new Color(180, 180, 180));
         this.setContentAreaFilled(false);
         this.setForeground(Color.WHITE);
         this.setFocusPainted(false);
