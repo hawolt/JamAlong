@@ -6,8 +6,10 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.net.ssl.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,12 +18,40 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class RemoteClient extends WebSocketClient {
-    private static String host = "ws://hawolt.com:48157/?sudo=false&name=%s";
+    private static String host = "wss://hawolt.com:48158/?sudo=false&name=%s";
+
+    private static class InsecureTrustManager implements X509TrustManager {
+        @Override
+        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
+
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) {
+
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+    }
+
+    private static SSLSocketFactory getInsecureSSLSocketFactory() {
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[]{new InsecureTrustManager()}, null);
+            return sslContext.getSocketFactory();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create insecure SSLSocketFactory", e);
+        }
+    }
 
     public static RemoteClient createAndConnectClientInstance(String username) {
         try {
             URI uri = new URI(String.format(host, username));
             RemoteClient client = new RemoteClient(uri);
+            client.setSocketFactory(getInsecureSSLSocketFactory());
             client.connect();
             return client;
         } catch (URISyntaxException e) {
