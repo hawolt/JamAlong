@@ -219,6 +219,8 @@ function getActiveSAAS() {
 }
 
 function hideAllSAAS(exception) {
+    let active = getActiveSAAS();
+    if (active === "updater" || active === "update") return;
     var elements = document.getElementsByClassName("saas");
     for (let i = 0; i < elements.length; i++) {
         var element = elements[i];
