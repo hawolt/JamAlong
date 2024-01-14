@@ -32,10 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Base64;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -309,7 +306,15 @@ public class LocalExecutor implements DownloadCallback {
             } catch (Exception e) {
                 // ignored
             }
-            ProcessBuilder builder = new ProcessBuilder("java", "-jar", path.toString());
+            List<String> list = new LinkedList<>();
+            list.add("java");
+            list.add("jar");
+            list.add(path.toString());
+            String[] args = application.getCLI();
+            for (int i = 0; i < args.length; i++) {
+                list.add(args[i]);
+            }
+            ProcessBuilder builder = new ProcessBuilder(list.toArray(String[]::new));
             builder.start();
             Logger.info("[updater] restarting for new version");
             System.exit(1);

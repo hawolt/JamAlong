@@ -28,6 +28,7 @@ public class Application {
     private int websocketPort;
     private boolean graceful;
     private String version;
+    private String[] args;
 
     public void setVersion(String version) {
         this.version = version;
@@ -124,5 +125,13 @@ public class Application {
     public void nullifyServerSocket() {
         if (serverSocket == null) return;
         this.serverSocket = null;
+    }
+
+    public void setCLI(String[] args) {
+        this.args = args;
+    }
+
+    public String[] getCLI() {
+        return args;
     }
 }

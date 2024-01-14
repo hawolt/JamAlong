@@ -50,6 +50,7 @@ public class Main {
             break;
         }
         Application application = new Application();
+        application.setCLI(args);
         Main.bootstrap(application, arguments, useOSR, allowMultipleClients);
         try {
             // initialize Settings
