@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.github.hawolt</groupId>
             <artifactId>soundcloud-downloader</artifactId>
-            <version>29dfd38564</version>
+            <version>8e911544bf</version>
         </dependency>
     </dependencies>
 
