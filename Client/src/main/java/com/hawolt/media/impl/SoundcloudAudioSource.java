@@ -7,8 +7,11 @@ import com.hawolt.data.media.hydratable.impl.playlist.Playlist;
 import com.hawolt.data.media.hydratable.impl.playlist.PlaylistManager;
 import com.hawolt.data.media.hydratable.impl.track.Track;
 import com.hawolt.data.media.hydratable.impl.track.TrackManager;
+import com.hawolt.data.media.hydratable.impl.user.User;
+import com.hawolt.data.media.hydratable.impl.user.UserManager;
 import com.hawolt.data.media.search.Explorer;
 import com.hawolt.data.media.search.query.ObjectCollection;
+import com.hawolt.data.media.search.query.impl.LikeQuery;
 import com.hawolt.data.media.search.query.impl.TrackQuery;
 import com.hawolt.logger.Logger;
 import com.hawolt.media.Audio;
@@ -32,8 +35,26 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
      * which are used internally by 'soundcloud-downloader' to forward any data to the appropriate handler.
      */
     public SoundcloudAudioSource() {
+        Soundcloud.register(User.class, new UserManager(this::onUser));
         Soundcloud.register(Track.class, new TrackManager(this::onTrackData));
         Soundcloud.register(Playlist.class, new PlaylistManager(this::onPlaylistData));
+    }
+
+    /**
+     * This method is called internally by 'soundcloud-downloader' when metadata for a user is loaded
+     *
+     * @param link the user link
+     * @param user the reference object containing metadata for the specified User
+     */
+    private void onUser(String link, User user) {
+        LikeQuery likeQuery = new LikeQuery(user.getLoadReferenceTimestamp(), user.getUserId());
+        try {
+            for (Track track : Explorer.browse(likeQuery)) {
+                addTrackAsPending(track.getLink());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
