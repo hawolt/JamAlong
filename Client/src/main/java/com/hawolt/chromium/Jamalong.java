@@ -55,7 +55,7 @@ public class Jamalong {
         frame.setVisible(true);
         Path path = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jcef-bundle");
         try {
-            Logger.debug("{}", "http://127.0.0.1:" + port);
+            Logger.info("{}", "http://127.0.0.1:" + port);
             Chromium chromium = new Chromium("http://127.0.0.1:" + port, path, useOSR, handler);
             frame.dispose();
             frame.setUndecorated(true);
