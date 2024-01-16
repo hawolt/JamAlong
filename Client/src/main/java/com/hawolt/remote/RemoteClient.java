@@ -51,7 +51,9 @@ public class RemoteClient extends WebSocketClient {
         try {
             URI uri = new URI(String.format(host, username));
             RemoteClient client = new RemoteClient(uri);
-            client.setSocketFactory(getInsecureSSLSocketFactory());
+            if (host.startsWith("wss")) {
+                client.setSocketFactory(getInsecureSSLSocketFactory());
+            }
             client.connect();
             return client;
         } catch (URISyntaxException e) {
