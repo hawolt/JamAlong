@@ -308,7 +308,7 @@ public class LocalExecutor implements DownloadCallback {
             }
             List<String> list = new LinkedList<>();
             list.add("java");
-            list.add("jar");
+            list.add("-jar");
             list.add(path.toString());
             String[] args = application.getCLI();
             for (int i = 0; i < args.length; i++) {
