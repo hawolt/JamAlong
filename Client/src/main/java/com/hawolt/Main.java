@@ -25,6 +25,18 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.ServerSocket;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -92,6 +104,8 @@ public class Main {
             application.getRichPresence().ifPresent(presence -> {
                 application.getRemoteClient().addInstructionListener(presence);
             });
+            // cleanup log files
+            Main.cleanup();
             // initialize JOIN
             if (partyId == null) return;
             JSONObject join = localExecutor.join(remoteClient, audioManager, partyId);
@@ -102,7 +116,6 @@ public class Main {
             System.err.println("Unable to launch Jamalong, exiting (1).");
             System.exit(1);
         }
-
     }
 
     private static final String[] REQUIRED_VM_OPTIONS = new String[]{
@@ -206,6 +219,24 @@ public class Main {
             } while (++attempts < 3);
             Logger.info("SingletonInstance down");
             if (!application.isGraceful()) System.exit(1);
+        });
+    }
+
+    private static void cleanup() throws IOException {
+        if (!Logger.LOG_TO_FILE) return;
+        Path directory = Logger.TARGET_DIRECTORY;
+        if (!Files.exists(directory) || !Files.isDirectory(directory)) return;
+        Instant now = Instant.now();
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Instant fileLastModifiedTime = attrs.lastModifiedTime().toInstant();
+                if (fileLastModifiedTime.isBefore(now.minus(1, ChronoUnit.DAYS))) {
+                    Files.delete(file);
+                    Logger.info("[cleanup] {}", file.getFileName());
+                }
+                return FileVisitResult.CONTINUE;
+            }
         });
     }
 }
