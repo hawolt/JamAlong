@@ -157,7 +157,7 @@ window.onload = function () {
     });
 
     document.getElementById("invite").addEventListener("click", function () {
-        copyToClipboard('https://jamalong.hawolt.com/?party=' + document.getElementById("party").innerHTML);
+        copyToClipboard('https://jamalo.ng/' + document.getElementById("party").innerHTML);
     });
 
     document.getElementById("select-host").addEventListener("click", function () {
