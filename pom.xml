@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.github.hawolt.hawolt-core</groupId>
             <artifactId>Logger</artifactId>
-            <version>394df4402c</version>
+            <version>716d20cf3e</version>
         </dependency>
         <dependency>
             <groupId>org.java-websocket</groupId>
