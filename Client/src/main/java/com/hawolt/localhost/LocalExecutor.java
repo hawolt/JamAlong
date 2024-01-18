@@ -133,7 +133,7 @@ public class LocalExecutor implements DownloadCallback {
         this.hostType = HostType.HOST;
         RemoteClient remoteClient = application.getRemoteClient();
         AudioManager audioManager = application.getAudioManager();
-        JSONObject object = remoteClient.executeBlocking("create","8bkaMakQ");
+        JSONObject object = remoteClient.executeBlocking("create");
         this.partyId = object.getString("result").split(" ")[0];
         application.getRichPresence().ifPresent(presence -> presence.set(this.partyId));
         context.result(object.toString());
