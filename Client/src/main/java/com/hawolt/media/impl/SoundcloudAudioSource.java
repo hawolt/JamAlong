@@ -3,6 +3,7 @@ package com.hawolt.media.impl;
 import com.hawolt.Soundcloud;
 import com.hawolt.audio.AudioFormatConverter;
 import com.hawolt.data.media.download.DownloadCallback;
+import com.hawolt.data.media.download.TrackFile;
 import com.hawolt.data.media.hydratable.impl.playlist.Playlist;
 import com.hawolt.data.media.hydratable.impl.playlist.PlaylistManager;
 import com.hawolt.data.media.hydratable.impl.track.Track;
@@ -13,14 +14,18 @@ import com.hawolt.data.media.search.Explorer;
 import com.hawolt.data.media.search.query.ObjectCollection;
 import com.hawolt.data.media.search.query.impl.LikeQuery;
 import com.hawolt.data.media.search.query.impl.TrackQuery;
+import com.hawolt.data.media.track.MP3;
 import com.hawolt.logger.Logger;
 import com.hawolt.media.Audio;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SoundcloudAudioSource extends AbstractAudioSource implements DownloadCallback {
+    private final ExecutorService service = Executors.newSingleThreadExecutor();
     private final Map<String, byte[]> cache = new HashMap<>();
     private final List<String> pending = new LinkedList<>();
     private final List<String> loading = new LinkedList<>();
@@ -223,13 +228,12 @@ public class SoundcloudAudioSource extends AbstractAudioSource implements Downlo
         }
         boolean isAudioCached = cache.containsKey(link);
         if (isAudioCached) handleAudioTrackCache(link, track);
-        else if (track.getLoadReferenceTimestamp() > timestamp) {
-            track.retrieveMP3().whenComplete((mp3, throwable) -> {
-                if (throwable != null) Logger.error(throwable);
-                if (mp3 == null) return;
-                mp3.download(this);
-            });
-        }
+        service.execute(() -> {
+            if (track.getLoadReferenceTimestamp() < timestamp) return;
+            MP3 mp3 = track.getMP3();
+            if (mp3 == null) return;
+            TrackFile.get(this, mp3, null);
+        });
     }
 
     /**
