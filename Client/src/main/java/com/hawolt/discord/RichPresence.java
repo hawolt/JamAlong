@@ -155,9 +155,12 @@ public class RichPresence implements Runnable, InstructionListener {
                 activity.party().size().setMaxSize(100);
                 activity.secrets().setJoinSecret(secret);
             }
-
             if (reference != null) activity.timestamps().setStart(reference);
-            core.activityManager().updateActivity(activity);
+            try {
+                core.activityManager().updateActivity(activity);
+            } catch (Exception e) {
+                Logger.error("Failed to update presence");
+            }
         }
     }
 
