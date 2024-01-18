@@ -85,6 +85,14 @@ public class LocalExecutor implements DownloadCallback {
         });
     }
 
+    private void reset(Application application) {
+        this.partyId = null;
+        AudioManager audioManager = application.getAudioManager();
+        audioManager.getAudioSource().setPartyLeaveTimestamp(System.currentTimeMillis());
+        audioManager.reset();
+    }
+
+
     private BiConsumer<Context, Application> OPEN = (context, application) -> {
         String url = context.pathParam("url");
         String plain = new String(Base64.getDecoder().decode(url.getBytes()));
@@ -121,10 +129,11 @@ public class LocalExecutor implements DownloadCallback {
     };
 
     private BiConsumer<Context, Application> HOST = (context, application) -> {
+        reset(application);
         this.hostType = HostType.HOST;
         RemoteClient remoteClient = application.getRemoteClient();
         AudioManager audioManager = application.getAudioManager();
-        JSONObject object = remoteClient.executeBlocking("create");
+        JSONObject object = remoteClient.executeBlocking("create","8bkaMakQ");
         this.partyId = object.getString("result").split(" ")[0];
         application.getRichPresence().ifPresent(presence -> presence.set(this.partyId));
         context.result(object.toString());
@@ -154,6 +163,7 @@ public class LocalExecutor implements DownloadCallback {
     };
 
     public JSONObject join(RemoteClient remoteClient, AudioManager audioManager, String partyId) {
+        reset(application);
         this.hostType = HostType.ATTENDEE;
         this.application.getAudioManager().setGatekeeper(true);
         JSONObject object = remoteClient.executeBlocking("join", partyId);
@@ -219,12 +229,10 @@ public class LocalExecutor implements DownloadCallback {
         context.result(object.toString());
     };
     private BiConsumer<Context, Application> RESET = (context, application) -> {
-        AudioManager audioManager = application.getAudioManager();
-        audioManager.getAudioSource().setPartyLeaveTimestamp(System.currentTimeMillis());
         RemoteClient remoteClient = application.getRemoteClient();
         JSONObject object = remoteClient.executeBlocking("leave", this.partyId == null ? "nil" : this.partyId);
-        audioManager.reset();
         context.result(object.toString());
+        reset(application);
     };
     private BiConsumer<Context, Application> VISIBILITY = (context, application) -> {
         JSONObject object = application.getRemoteClient().executeBlocking("visibility", context.pathParam("partyId"), context.pathParam("status"));
